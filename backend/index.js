@@ -13,8 +13,10 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 const usersRoute = require('./routes/userRoute');
+const leadsRoute = require('./routes/leadsRoute');
 
-app.use('/user', usersRoute);
+app.use('/users', usersRoute);
+app.use('/leads', leadsRoute);
 
 if(process.env.DEVELOPMENT_MODE == "true"){
     var httpServer = http.createServer(app);
