@@ -8,6 +8,8 @@ const { v4: uuidv4 } = require('uuid');
 router.get('/all', validateToken, async (req, res) => {
     try {
       const { property_id, search } = req.query;
+
+      const idUser = req.user.id;
       
       let query = 'SELECT * FROM ImportedLeads WHERE 1=1';
       const params = {};
@@ -21,8 +23,12 @@ router.get('/all', validateToken, async (req, res) => {
         query += ' AND (nome LIKE @search OR email LIKE @search OR celular LIKE @search OR cpf LIKE @search)';
         params.search = `%${search}%`;
       }
+
+      if(idUser){
+        params.idUser = idUser;
+      }
       
-      query += ' ORDER BY dataCadastro DESC';
+      query += ' AND idUser=@idUser ORDER BY dataCadastro DESC';
       
       const result = await db.query(query, params);
       
@@ -36,7 +42,10 @@ router.get('/all', validateToken, async (req, res) => {
   // Obter um lead específico
   router.get('/:id', validateToken, async (req, res) => {
     try {
-      const result = await db.query('SELECT * FROM ImportedLeads WHERE id = @id', { id: req.params.id });
+
+      const idUser = req.user.id;
+
+      const result = await db.query('SELECT * FROM ImportedLeads WHERE id = @id AND idUser = @idUser', { id: req.params.id, idUser: idUser });
       
       if (!result || result.length === 0) {
         return res.status(404).json({ message: 'Lead não encontrado' });

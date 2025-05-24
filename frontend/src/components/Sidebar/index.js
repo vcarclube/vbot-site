@@ -150,10 +150,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {isOpen && user && (
             <div className="sidebar-user">
               <div className="sidebar-user-avatar">
-                {user.nome ? user.nome.charAt(0).toUpperCase() : 'U'}
+                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="sidebar-user-info">
-                <div className="sidebar-user-name">{user.nome || 'Usuário'}</div>
+                <div className="sidebar-user-name">{user.name || 'Usuário'}</div>
                 <div className="sidebar-user-email">{user.email || ''}</div>
               </div>
             </div>
@@ -194,13 +194,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className={`mobile-drawer ${showMobileDrawer ? 'open' : ''}`}>
         <div className="mobile-drawer-header">
           <div className="mobile-drawer-user">
+            {console.log(user.name)}
             {user && (
               <>
                 <div className="mobile-drawer-avatar">
-                  {user.nome ? user.nome.charAt(0).toUpperCase() : 'U'}
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <div className="mobile-drawer-user-info">
-                  <div className="mobile-drawer-user-name">{user.nome || 'Usuário'}</div>
+                  <div className="mobile-drawer-user-name">{user.name || 'Usuário'}</div>
                   <div className="mobile-drawer-user-email">{user.email || ''}</div>
                 </div>
               </>
