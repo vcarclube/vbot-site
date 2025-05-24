@@ -7,7 +7,7 @@ import Api from './Api';
 import Utils from './Utils';
 
 // Importação de páginas
-import { Home, Leads, Login, PageNotFound } from './pages';
+import { Campanhas, Home, Leads, Login, PageNotFound } from './pages';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 
@@ -178,7 +178,7 @@ function App() {
             path="/campaigns" 
             element={
               <PrivateRoute>
-                <div>Página de Campanhas (a ser implementada)</div>
+                <Campanhas/>
               </PrivateRoute>
             } 
           />

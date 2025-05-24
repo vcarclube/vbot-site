@@ -727,7 +727,7 @@ const Leads = () => {
                                         <th>Grupo</th>
                                         <th>Estado</th>
                                         <th>Cidade</th>
-                                        <th>Etapa</th>
+                                        <th>Etapa&nbsp;do&nbsp;Funil</th>
                                         <th>Cadastro</th>
                                         <th>Ações</th>
                                     </tr>

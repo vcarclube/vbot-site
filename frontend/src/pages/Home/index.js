@@ -116,7 +116,7 @@ const Home = () => {
         <div className="dashboard-header">
           <div className="dashboard-title">
             <h1>Dashboard</h1>
-            <p>Bem-vindo, {user?.nome || 'Usuário'}! Aqui está o desempenho das suas campanhas.</p>
+            <p>Bem-vindo, {user?.name || 'Usuário'}! Aqui está o desempenho das suas campanhas.</p>
           </div>
           
           <div className="dashboard-actions">

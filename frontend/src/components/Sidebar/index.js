@@ -194,7 +194,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className={`mobile-drawer ${showMobileDrawer ? 'open' : ''}`}>
         <div className="mobile-drawer-header">
           <div className="mobile-drawer-user">
-            {console.log(user.name)}
             {user && (
               <>
                 <div className="mobile-drawer-avatar">
