@@ -93,14 +93,14 @@ const Campanhas = () => {
 
         // Aplicar filtros
         if (filters.status) {
-            result = result.filter(campanha => campanha.status === filters.status);
+            result = result.filter(campanha => campanha.Status === filters.status);
         }
 
         // Aplicar termo de busca
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             result = result.filter(campanha =>
-                (campanha.nome && campanha.nome.toLowerCase().includes(term))
+                (campanha.Name && campanha.Name.toLowerCase().includes(term))
             );
         }
 
@@ -165,10 +165,12 @@ const Campanhas = () => {
         const dataFim = campanha.EndDate ? campanha.EndDate.split('T')[0] : '';
         const horaFim = campanha.EndDate ? campanha.EndDate.split('T')[1].substring(0, 5) : '';
 
+        console.log(campanha.Messages?.map(m => m.message))
+
         setFormData({
             nome: campanha.Name || '',
-            grupos: campanha.Groups || [],
-            mensagens: campanha.Messages || [''],
+            grupos: campanha.Groups?.split("|") || [],
+            mensagens: campanha.Messages?.map(m => m.message) || [''],
             dataInicio,
             horaInicio,
             dataFim,
