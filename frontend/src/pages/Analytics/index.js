@@ -181,7 +181,7 @@ const Analytics = () => {
                 {/* Gráficos */}
                 <div className="charts-grid">
 
-                    <Card className="chart-card">
+                    <Card className="chart-card-analytic">
                         <div className="chart-header">
                             <h3>Desempenho de Campanhas</h3>
                         </div>
@@ -200,7 +200,7 @@ const Analytics = () => {
                     </Card>
 
 
-                    <Card className="chart-card">
+                    <Card className="chart-card-analytic">
                         <div className="chart-header">
                             <h3>Crescimento de Leads</h3>
                         </div>
@@ -219,7 +219,7 @@ const Analytics = () => {
                     </Card>
 
 
-                    <Card className="chart-card">
+                    <Card className="chart-card-analytic">
                         <div className="chart-header">
                             <h3>Taxa de Entrega</h3>
                         </div>

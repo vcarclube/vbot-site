@@ -272,6 +272,14 @@
     .metrics-grid {
       grid-template-columns: 1fr;
     }
+
+    .chart-card-analytic {
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition);
+      grid-column: span 12 !important;  
+    }
+    
   }
 
   .metric-icon.active-campaigns {
