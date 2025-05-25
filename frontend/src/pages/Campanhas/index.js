@@ -628,7 +628,7 @@ const Campanhas = () => {
                                     name="dataInicio"
                                     value={formData.dataInicio}
                                     onChange={handleFormChange}
-                                    min={new Date().toISOString().split('T')[0]}
+                                    min={(new Date().toISOString().split('T')[0])}
                                     required
                                 />
                             </div>

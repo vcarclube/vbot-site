@@ -5,3 +5,4 @@ export { default as Privacy } from './Privacy';
 export { default as Terms } from './Terms';
 export { default as Leads } from './Leads';
 export { default as Campanhas } from './Campanhas';
+export { default as Instancias } from './Instancias';

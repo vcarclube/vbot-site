@@ -41,7 +41,6 @@ const Api = {
             return { success: false, error };
         }
     },
-    // Métodos genéricos
 
     auth: async () => {
         return await axios.get(`${API_BASE}/users/auth`, Environment.HEADERS).then(async (response) => {
@@ -181,6 +180,24 @@ const Api = {
             return { success: false, error: error.response?.data?.message || 'Erro ao buscar grupos de leads' };
         }
     },
+
+    getInstancias: async () => {
+        try {
+            const response = await axios.get(`${API_BASE}/instancias/all`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar instâncias' };
+        }
+    },
+
+    getInstancia: async (id) => {
+        try {
+            const response = await axios.get(`${API_BASE}/instancias/${id}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar instância' };
+        }
+    }
 }
 
 export default Api;

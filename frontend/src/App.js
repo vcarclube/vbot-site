@@ -7,7 +7,7 @@ import Api from './Api';
 import Utils from './Utils';
 
 // Importação de páginas
-import { Campanhas, Home, Leads, Login, PageNotFound } from './pages';
+import { Campanhas, Home, Instancias, Leads, Login, PageNotFound } from './pages';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 
@@ -187,6 +187,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Leads/>
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/instances" 
+            element={
+              <PrivateRoute>
+                <Instancias/>
               </PrivateRoute>
             } 
           />
