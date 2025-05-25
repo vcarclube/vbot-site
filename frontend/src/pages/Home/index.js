@@ -710,43 +710,22 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <RadialBarChart 
-                    cx="50%" 
-                    cy="50%" 
-                    innerRadius="10%" 
-                    outerRadius="80%" 
-                    barSize={20} 
-                    data={leadsByFunnel}
-                  >
-                    <RadialBar
-                      minAngle={15}
-                      label={{ position: 'insideStart', fill: '#fff' }}
-                      background
-                      clockWise
+                  <PieChart>
+                    <Pie
+                      data={leadsByFunnel}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={100}
+                      fill="#8884d8"
                       dataKey="valor"
                       nameKey="etapa"
+                      label={({name, percent}) => `${name}: ${(percent * 100).toFixed(1)}%`}
                     >
                       {leadsByFunnel.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={COLORS[index % COLORS.length]} 
-                        />
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
-                    </RadialBar>
-                    <Legend 
-                      iconSize={10} 
-                      layout="vertical" 
-                      verticalAlign="middle" 
-                      wrapperStyle={{
-                        fontSize: '12px',
-                        right: 0,
-                        top: 0,
-                        lineHeight: '24px'
-                      }}
-                      formatter={(value) => {
-                        return value?.length > 15 ? `${value?.substring(0, 15)}...` : value;
-                      }}
-                    />
+                    </Pie>
                     <Tooltip 
                       formatter={(value) => [formatNumber(value), 'Leads']}
                       contentStyle={{ 
@@ -756,7 +735,8 @@ const Dashboard = () => {
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                       }} 
                     />
-                  </RadialBarChart>
+                    <Legend />
+                  </PieChart>
                 </ResponsiveContainer>
               )}
             </div>

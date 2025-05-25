@@ -562,7 +562,7 @@
 /* Responsividade */
 @media (max-width: 1200px) {
   .chart-card.large {
-    grid-column: span 12;
+    grid-column: span 6;
   }
   
   .chart-card.medium {
@@ -613,11 +613,22 @@
   .list-card {
     grid-column: span 12;
   }
+
+  .chart-card.large{
+    grid-column: span 12 !important;
+  }
+
+  .metric-content {
+    display: flex;
+    align-items: center;
+    padding: 0 !important;
+  }
+
 }
 
 @media (max-width: 576px) {
   .metrics-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: none !important;
   }
   
   .quick-actions {
@@ -627,5 +638,11 @@
   .lead-details, .task-details, .instance-details {
     flex-direction: column;
     gap: 4px;
+  }
+
+  .metric-content {
+    display: flex;
+    align-items: center;
+    padding: 0 !important;
   }
 }
