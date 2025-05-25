@@ -456,13 +456,15 @@ const Campanhas = () => {
                                             <td className="campanha-actions">
                                                 <div className="action-buttons">
                                                     {/* Botão Editar */}
-                                                    <button
-                                                        onClick={() => handleEditCampanha(campanha)}
-                                                        className="action-btn edit-btn"
-                                                        title="Editar"
-                                                    >
-                                                        <i className="fas fa-edit"></i>
-                                                    </button>
+                                                    {campanha.Status !== 'Ativo' && (
+                                                        <button
+                                                            onClick={() => handleEditCampanha(campanha)}
+                                                            className="action-btn edit-btn"
+                                                            title="Editar"
+                                                        >
+                                                            <i className="fas fa-edit"></i>
+                                                        </button>
+                                                    )}
 
                                                     {/* Botão Ativar (visível apenas quando não estiver ativo) */}
                                                     {campanha.Status !== 'Ativo' && (

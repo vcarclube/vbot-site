@@ -61,15 +61,14 @@ const Instancias = () => {
     
     // Aplicar filtros
     if (filters.status) {
-      result = result.filter(instancia => instancia.status === filters.status);
+      result = result.filter(instancia => instancia.Status === filters.status);
     }
     
     // Aplicar termo de busca
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(instancia => 
-        (instancia.nome && instancia.nome.toLowerCase().includes(term)) ||
-        (instancia.numero && instancia.numero.includes(term))
+        (instancia.Name && instancia.Name.toLowerCase().includes(term))
       );
     }
     
@@ -183,9 +182,8 @@ const Instancias = () => {
                 >
                   <option value="">Todos os status</option>
                   <option value="Conectado">Conectado</option>
-                  <option value="disconnected">Desconectado</option>
+                  <option value="Desconectado">Desconectado</option>
                   <option value="Aguardando escaneamento do QR Code">Aguardando QR Code</option>
-                  <option value="loading">Carregando</option>
                 </Select>
               </div>
               

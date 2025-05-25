@@ -156,6 +156,25 @@ router.post('/', validateToken, async (req, res) => {
             await db.query(insertLeadsQuery);
         }
 
+        //Atualiza leads para prospecção
+        const groupParams = Groups.map((_, index) => `@group${index}`).join(', ');
+
+        const updateImportedLeadsQuery = `
+            UPDATE ImportedLeads
+            SET EtapaFunil = @EtapaFunil
+            WHERE NomeGrupo IN (${groupParams}) AND idUser = @idUser
+        `;
+
+        const paramsLeads = {
+            EtapaFunil: "Prospecção",
+            idUser: req.user.id
+        };
+
+        Groups.forEach((group, index) => {
+            paramsLeads[`group${index}`] = group;
+        });
+
+        await db.query(updateImportedLeadsQuery, paramsLeads);
 
         return res.status(201).json({
             success: true,
