@@ -388,11 +388,11 @@ router.delete('/:id', validateToken, async (req, res) => {
         }
 
         const deleteQuery = `
-      DELETE FROM Campaigns 
-      WHERE id = @id AND idUser = @idUser;
+            DELETE FROM Leads WHERE CampaignId = @id;
 
-      DELETE FROM Leads WHERE CampaignId = @id;
-    `;
+            DELETE FROM Campaigns 
+            WHERE id = @id AND idUser = @idUser;
+        `;
 
         await db.query(deleteQuery, {
             id: req.params.id,

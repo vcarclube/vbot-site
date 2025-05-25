@@ -7,7 +7,7 @@ import Api from './Api';
 import Utils from './Utils';
 
 // Importação de páginas
-import { Campanhas, Home, Instancias, Leads, Login, PageNotFound } from './pages';
+import { Analytics, Automacao, Campanhas, Home, Instancias, Leads, Login, PageNotFound, Settings } from './pages';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 
@@ -191,6 +191,14 @@ function App() {
             } 
           />
           <Route 
+            path="/automation" 
+            element={
+              <PrivateRoute>
+                <Automacao/>
+              </PrivateRoute>
+            } 
+          />
+          <Route 
             path="/instances" 
             element={
               <PrivateRoute>
@@ -202,7 +210,7 @@ function App() {
             path="/analytics" 
             element={
               <PrivateRoute>
-                <div>Página de Análises (a ser implementada)</div>
+                <Analytics/>
               </PrivateRoute>
             } 
           />
@@ -210,7 +218,7 @@ function App() {
             path="/settings" 
             element={
               <PrivateRoute>
-                <div>Página de Configurações (a ser implementada)</div>
+                <Settings/>
               </PrivateRoute>
             } 
           />

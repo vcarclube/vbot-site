@@ -119,7 +119,7 @@ const Home = () => {
             <p>Bem-vindo, {user?.name || 'Usuário'}! Aqui está o desempenho das suas campanhas.</p>
           </div>
           
-          <div className="dashboard-actions">
+          {/*<div className="dashboard-actions">
             <div className="dashboard-timeframe">
               <button 
                 className={`timeframe-btn ${timeframe === 'week' ? 'active' : ''}`}
@@ -140,8 +140,8 @@ const Home = () => {
                 Trimestre
               </button>
             </div>
-          
-          </div>
+          </div>*/}
+
         </div>
         
         {isLoading ? (

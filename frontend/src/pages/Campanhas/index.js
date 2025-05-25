@@ -459,7 +459,7 @@ const Campanhas = () => {
                                                     {campanha.Status !== 'Ativo' && (
                                                         <button
                                                             onClick={() => handleEditCampanha(campanha)}
-                                                            className="action-btn edit-btn"
+                                                            className="action-btn-cmp edit-btn-cmp-cmp"
                                                             title="Editar"
                                                         >
                                                             <i className="fas fa-edit"></i>
@@ -470,7 +470,7 @@ const Campanhas = () => {
                                                     {campanha.Status !== 'Ativo' && (
                                                         <button
                                                             onClick={() => handleChangeStatus(campanha.Id, 'Ativo')}
-                                                            className="action-btn activate-btn"
+                                                            className="action-btn-cmp activate-btn-cmp"
                                                             title="Ativar"
                                                         >
                                                             <i className="fas fa-play"></i>
@@ -481,7 +481,7 @@ const Campanhas = () => {
                                                     {campanha.Status === 'Ativo' && (
                                                         <button
                                                             onClick={() => handleChangeStatus(campanha.Id, 'Pausada')}
-                                                            className="action-btn pause-btn"
+                                                            className="action-btn-cmp pause-btn"
                                                             title="Pausar"
                                                         >
                                                             <i className="fas fa-pause"></i>
@@ -492,7 +492,7 @@ const Campanhas = () => {
                                                     {['Pausada', 'Agendada'].includes(campanha.Status) && (
                                                         <button
                                                             onClick={() => handleChangeStatus(campanha.Id, 'Finalizada')}
-                                                            className="action-btn finish-btn"
+                                                            className="action-btn-cmp finish-btn-cmp"
                                                             title="Finalizar"
                                                         >
                                                             <i className="fas fa-stop"></i>
@@ -502,7 +502,7 @@ const Campanhas = () => {
                                                     {/* Botão Excluir */}
                                                     <button
                                                         onClick={() => handleDeleteCampanha(campanha.Id)}
-                                                        className="action-btn delete-btn"
+                                                        className="action-btn-cmp delete-btn-cmp"
                                                         title="Excluir"
                                                     >
                                                         <i className="fas fa-trash-alt"></i>

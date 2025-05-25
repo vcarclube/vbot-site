@@ -485,7 +485,7 @@
   justify-content: flex-end;
 }
 
-.action-btn {
+.action-btn-cmp {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
@@ -499,58 +499,58 @@
 }
 
 /* Estilos específicos para cada botão */
-.edit-btn {
+.edit-btn-cmp {
   background-color: var(--info-bg);
   color: var(--info);
 }
 
-.edit-btn:hover {
+.edit-btn-cmp:hover {
   background-color: var(--info);
   color: var(--white);
 }
 
-.activate-btn {
+.activate-btn-cmp {
   background-color: var(--success-bg);
   color: var(--success);
 }
 
-.activate-btn:hover {
+.activate-btn-cmp:hover {
   background-color: var(--success);
   color: var(--white);
 }
 
-.pause-btn {
+.pause-btn-cmp {
   background-color: var(--warning-bg);
   color: var(--warning);
 }
 
-.pause-btn:hover {
+.pause-btn-cmp:hover {
   background-color: var(--warning);
   color: var(--white);
 }
 
-.finish-btn {
+.finish-btn-cmp {
   background-color: var(--gray-200);
   color: var(--gray-700);
 }
 
-.finish-btn:hover {
+.finish-btn-cmp:hover {
   background-color: var(--gray-700);
   color: var(--white);
 }
 
-.delete-btn {
+.delete-btn-cmp {
   background-color: var(--error-bg);
   color: var(--error);
 }
 
-.delete-btn:hover {
+.delete-btn-cmp:hover {
   background-color: var(--error);
   color: var(--white);
 }
 
 /* Tooltip personalizado (opcional) */
-.action-btn::after {
+.action-btn-cmp::after {
   content: attr(title);
   position: absolute;
   top: -30px;
@@ -568,7 +568,7 @@
   z-index: 1000;
 }
 
-.action-btn::before {
+.action-btn-cmp::before {
   content: '';
   position: absolute;
   top: -10px;
@@ -583,8 +583,8 @@
   z-index: 1000;
 }
 
-.action-btn:hover::after,
-.action-btn:hover::before {
+.action-btn-cmp:hover::after,
+.action-btn-cmp:hover::before {
   opacity: 1;
   visibility: visible;
 }
@@ -595,7 +595,7 @@
     gap: 4px;
   }
   
-  .action-btn {
+  .action-btn-cmp {
     width: 28px;
     height: 28px;
     font-size: 0.8rem;

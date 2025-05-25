@@ -197,7 +197,80 @@ const Api = {
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao buscar instância' };
         }
-    }
+    },
+
+    getAnalyticsLeadsGrowth: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/analytics/leads-growth?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar dados de crescimento de leads' };
+        }
+    },
+
+    getAnalyticsMetrics: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/analytics/metrics?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar dados de crescimento de leads' };
+        }
+    },
+
+    // Métodos para automações
+    getAutomacoes: async () => {
+        try {
+            const response = await axios.get(`${API_BASE}/automacoes`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar automações' };
+        }
+    },
+
+    getAutomacao: async (id) => {
+        try {
+            const response = await axios.get(`${API_BASE}/automacoes/${id}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar automação' };
+        }
+    },
+
+    createAutomacao: async (data) => {
+        try {
+            const response = await axios.post(`${API_BASE}/automacoes`, data, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao criar automação' };
+        }
+    },
+
+    updateAutomacao: async (id, data) => {
+        try {
+            const response = await axios.put(`${API_BASE}/automacoes/${id}`, data, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao atualizar automação' };
+        }
+    },
+
+    updateAutomacaoStatus: async (id, status) => {
+        try {
+            const response = await axios.patch(`${API_BASE}/automacoes/${id}/status`, { status }, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao atualizar status da automação' };
+        }
+    },
+
+    deleteAutomacao: async (id) => {
+        try {
+            const response = await axios.delete(`${API_BASE}/automacoes/${id}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao excluir automação' };
+        }
+    },
 }
 
 export default Api;

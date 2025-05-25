@@ -16,11 +16,15 @@ const usersRoute = require('./routes/userRoute');
 const leadsRoute = require('./routes/leadsRoute');
 const campanhasRoute = require('./routes/campanhasRoute');
 const instanciasRoute = require('./routes/instanciasRoute');
+const analyticsRoute = require('./routes/analyticsRoute');
+const automacoesRoute = require('./routes/automacoesRoute');
 
 app.use('/users', usersRoute);
 app.use('/leads', leadsRoute);
 app.use('/campanhas', campanhasRoute);
 app.use('/instancias', instanciasRoute);
+app.use('/analytics', analyticsRoute);
+app.use('/automacoes', automacoesRoute);
 
 if(process.env.DEVELOPMENT_MODE == "true"){
     var httpServer = http.createServer(app);
