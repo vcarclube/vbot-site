@@ -8,10 +8,11 @@ router.get('/all', validateToken, async (req, res) => {
   try {
     const query = `
       SELECT * FROM WhatsAppInstances 
+      WHERE idUser = @idUser
       ORDER BY Name
     `;
     
-    const result = await db.query(query, { });
+    const result = await db.query(query, { idUser: req.user.id });
     
     return res.status(200).json(result.recordsets[0]);
   } catch (error) {

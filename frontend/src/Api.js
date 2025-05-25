@@ -271,6 +271,116 @@ const Api = {
             return { success: false, error: error.response?.data?.message || 'Erro ao excluir automação' };
         }
     },
+
+    // Métodos para dashboard
+    getDashboardSummary: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/summary?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar resumo do dashboard' };
+        }
+    },
+
+    getDashboardMessagesByDay: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/messages-by-day?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar mensagens por dia' };
+        }
+    },
+
+    getDashboardLeadsBySource: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/leads-by-source?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar leads por fonte' };
+        }
+    },
+
+    getDashboardLeadsByState: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/leads-by-state?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar leads por estado' };
+        }
+    },
+
+    getDashboardLeadsByFunnel: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/leads-by-funnel?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar leads por etapa do funil' };
+        }
+    },
+
+    getDashboardCampaignPerformance: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/campaign-performance?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar desempenho de campanhas' };
+        }
+    },
+
+    getDashboardWhatsAppInstancesStatus: async () => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/whatsapp-instances-status`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar status das instâncias WhatsApp' };
+        }
+    },
+
+    getDashboardWhatsAppInstancesActivity: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/whatsapp-instances-activity?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar atividade das instâncias WhatsApp' };
+        }
+    },
+
+    getDashboardRecentWhatsAppInstances: async () => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/recent-whatsapp-instances`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar instâncias WhatsApp recentes' };
+        }
+    },
+
+    getDashboardRecentLeads: async () => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/recent-leads`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar leads recentes' };
+        }
+    },
+
+    getDashboardGenderDistribution: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/gender-distribution?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar distribuição por gênero' };
+        }
+    },
+
+    getDashboardAgeDistribution: async (timeRange) => {
+        try {
+            const response = await axios.get(`${API_BASE}/dashboard/age-distribution?timeRange=${timeRange}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao buscar distribuição por idade' };
+        }
+    },
+
 }
 
 export default Api;

@@ -47,18 +47,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       priority: 1
     },
     {
-      id: 'campaigns',
-      label: 'Campanhas',
-      icon: 'fas fa-bullhorn',
-      path: '/campaigns',
-      priority: 2
-    },
-    {
       id: 'leads',
       label: 'Leads',
       icon: 'fas fa-users',
       path: '/leads',
       priority: 3
+    },
+    {
+      id: 'campaigns',
+      label: 'Campanhas',
+      icon: 'fas fa-bullhorn',
+      path: '/campaigns',
+      priority: 2
     },
     {
       id: 'automation',
