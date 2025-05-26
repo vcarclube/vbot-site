@@ -11,6 +11,7 @@ import * as XLSX from 'xlsx';
 import './style.css';
 import Environment from '../../Environment';
 import Utils from '../../Utils';
+import LeadsTable from '../../components/LeadsTable';
 
 const Leads = () => {
     // Estados
@@ -717,63 +718,12 @@ const Leads = () => {
                             </Button>
                         </div>
                     ) : (
-                        <div className="leads-table-container">
-                            <table className="leads-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Email</th>
-                                        <th>Celular</th>
-                                        <th>Grupo</th>
-                                        <th>Estado</th>
-                                        <th>Cidade</th>
-                                        <th>Etapa&nbsp;do&nbsp;Funil</th>
-                                        <th>Cadastro</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredLeads?.map(lead => (
-                                        <tr key={lead.id}>
-                                            <td className="lead-name">{lead.Nome || '-'}</td>
-                                            <td>{lead.Email || '-'}</td>
-                                            <td>{Utils.formatToCelular(lead.Celular) || '-'}</td>
-                                            <td>
-                                                {lead.NomeGrupo ? (
-                                                    <span className="lead-group">{lead.NomeGrupo}</span>
-                                                ) : '-'}
-                                            </td>
-                                            <td>{lead.Estado || '-'}</td>
-                                            <td>{lead.Cidade || '-'}</td>
-                                            <td>
-                                                {lead.EtapaFunil ? (
-                                                    <span className="lead-stage">{lead.EtapaFunil}</span>
-                                                ) : '-'}
-                                            </td>
-                                            <td>{formatDate(lead.DataCadastro)}</td>
-                                            <td className="lead-actions">
-                                                <button
-                                                    className="lead-action-btn edit"
-                                                    onClick={() => handleEditLead(lead)}
-                                                    title="Editar"
-                                                >
-                                                    <i className="fas fa-edit"></i>
-                                                </button>
-                                                <button
-                                                    className="lead-action-btn delete"
-                                                    onClick={() => handleDeleteLead(lead.Id)}
-                                                    title="Remover"
-                                                >
-                                                    <i className="fas fa-trash-alt"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <>
+                        <LeadsTable filteredLeads={filteredLeads} handleEditLead={handleEditLead} handleDeleteLead={handleDeleteLead}/>
+                        </>
                     )}
                 </Card>
+
             </div>
 
             {/* Modal para adicionar/editar lead */}
