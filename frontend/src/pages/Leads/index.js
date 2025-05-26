@@ -352,9 +352,9 @@ const Leads = () => {
                     nascimento: findColumnIndex(headers, ['nascimento', 'data de nascimento', 'birth', 'birthday', 'Nascimento', 'Data de Nascimento']),
                     genero: findColumnIndex(headers, ['genero', 'gênero', 'sexo', 'gender', 'sex', 'Genero', 'Gênero', 'Sexo', 'Sex']),
                     idade: findColumnIndex(headers, ['idade', 'age', 'Idade']),
-                    estado: findColumnIndex(headers, ['estado', 'uf', 'state', 'Estado']),
-                    cidade: findColumnIndex(headers, ['cidade', 'city', 'Cidade']),
-                    bairro: findColumnIndex(headers, ['bairro', 'neighborhood', 'Bairro']),
+                    estado: findColumnIndex(headers, ['estado', 'uf', 'state', 'Estado', 'EnderecoUF']),
+                    cidade: findColumnIndex(headers, ['cidade', 'city', 'Cidade', 'EnderecoCidade']),
+                    bairro: findColumnIndex(headers, ['bairro', 'neighborhood', 'Bairro', 'EnderecoBairro']),
                     nomeGrupo: findColumnIndex(headers, ['grupo', 'group', 'segmento', 'segment', 'Grupo']),
                     etapaFunil: findColumnIndex(headers, ['etapa', 'etapa do funil', 'stage', 'funnel stage', 'Etapa']),
                     tags: findColumnIndex(headers, ['tags', 'etiquetas', 'labels', 'Tags', 'Etiquetas', 'Labels'])

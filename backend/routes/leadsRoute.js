@@ -4,6 +4,49 @@ const db = require('../database');
 const { validateToken } = require('../middlewares/AuthMiddleware');
 const { v4: uuidv4 } = require('uuid');
 
+const normalizarEstado = (estado) => {
+  const estados = {
+    AC: "Acre",
+    AL: "Alagoas",
+    AP: "Amapá",
+    AM: "Amazonas",
+    BA: "Bahia",
+    CE: "Ceará",
+    DF: "Distrito Federal",
+    ES: "Espírito Santo",
+    GO: "Goiás",
+    MA: "Maranhão",
+    MT: "Mato Grosso",
+    MS: "Mato Grosso do Sul",
+    MG: "Minas Gerais",
+    PA: "Pará",
+    PB: "Paraíba",
+    PR: "Paraná",
+    PE: "Pernambuco",
+    PI: "Piauí",
+    RJ: "Rio de Janeiro",
+    RN: "Rio Grande do Norte",
+    RS: "Rio Grande do Sul",
+    RO: "Rondônia",
+    RR: "Roraima",
+    SC: "Santa Catarina",
+    SP: "São Paulo",
+    SE: "Sergipe",
+    TO: "Tocantins"
+  };
+
+  // Verifica se é uma sigla válida e retorna o nome completo
+  if (estado && typeof estado === 'string') {
+    const sigla = estado.toUpperCase();
+    if (estados[sigla]) {
+      return estados[sigla];
+    }
+  }
+
+  // Se não for uma sigla conhecida, retorna como está
+  return estado;
+}
+
 // Obter todos os leads
 router.get('/all', validateToken, async (req, res) => {
   try {
@@ -308,7 +351,7 @@ router.post('/import', validateToken, async (req, res) => {
         params[`${paramPrefix}_nascimento`] = lead.nascimento ? new Date(lead.nascimento) : null;
         params[`${paramPrefix}_genero`] = lead.genero || '';
         params[`${paramPrefix}_idade`] = lead.idade ? parseInt(lead.idade, 10) : null;
-        params[`${paramPrefix}_estado`] = lead.estado || '';
+        params[`${paramPrefix}_estado`] = normalizarEstado(lead.estado) || '';
         params[`${paramPrefix}_cidade`] = lead.cidade || '';
         params[`${paramPrefix}_bairro`] = lead.bairro || '';
         params[`${paramPrefix}_nomeGrupo`] = grupoNome || '';
