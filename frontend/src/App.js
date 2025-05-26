@@ -10,6 +10,7 @@ import Utils from './Utils';
 import { Analytics, Automacao, Campanhas, Home, Instancias, Leads, Login, PageNotFound, Settings } from './pages';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import LoadingScreen from './components/LoadingScreen';
 
 // Componente para rotas privadas
 const PrivateRoute = ({ children }) => {
@@ -18,7 +19,7 @@ const PrivateRoute = ({ children }) => {
   
   // Enquanto verifica a autenticação, pode mostrar um loading
   if (loading) {
-    return <div className="app-loading">Carregando...</div>;
+    return  <LoadingScreen />;
   }
   
   // Redireciona para login se não estiver autenticado
@@ -36,7 +37,7 @@ const PublicRoute = ({ children, restricted = false }) => {
   
   // Se a rota for restrita (como login) e o usuário estiver autenticado, redireciona para home
   if (loading) {
-    return <div className="app-loading">Carregando...</div>;
+    return  <LoadingScreen />;
   }
   
   if (authenticated && restricted) {
