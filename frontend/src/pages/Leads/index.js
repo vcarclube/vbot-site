@@ -345,9 +345,9 @@ const Leads = () => {
 
                 // Inicializar mapeamento de colunas
                 const initialColumnMapping = {
-                    nome: findColumnIndex(headers, ['nome', 'name', 'nome completo', 'full name', 'Nome']),
+                    nome: findColumnIndex(headers, ['nome', 'name', 'nome completo', 'full name', 'Nome', 'Nome Completo', 'Name']),
                     email: findColumnIndex(headers, ['email', 'e-mail', 'correio eletrônico', 'Email', 'E-mail', 'E-Mail']),
-                    celular: findColumnIndex(headers, ['celular', 'telefone', 'mobile', 'phone', 'tel', 'Celular']),
+                    celular: findColumnIndex(headers, ['celular', 'telefone', 'mobile', 'phone', 'tel', 'Celular', 'Telefone', 'Mobile']),
                     cpf: findColumnIndex(headers, ['cpf', 'documento', 'document', 'Cpf', 'CPF']),
                     nascimento: findColumnIndex(headers, ['nascimento', 'data de nascimento', 'birth', 'birthday', 'Nascimento', 'Data de Nascimento']),
                     genero: findColumnIndex(headers, ['genero', 'gênero', 'sexo', 'gender', 'sex', 'Genero', 'Gênero', 'Sexo', 'Sex']),
