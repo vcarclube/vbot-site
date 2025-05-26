@@ -4,6 +4,86 @@ const db = require('../database');
 const { validateToken } = require('../middlewares/AuthMiddleware');
 const { v4: uuidv4 } = require('uuid');
 
+const converterParaData = (entrada) => {
+  if (!entrada || typeof entrada !== 'string') return null;
+
+  // Limpa e normaliza separadores
+  const limpa = entrada.trim().replace(/[.\/]/g, '-');
+
+  const partes = limpa.split('-');
+
+  let ano, mes, dia;
+
+  if (partes.length === 3) {
+    if (partes[0].length === 4) {
+      // Formato: YYYY-MM-DD
+      [ano, mes, dia] = partes;
+    } else if (partes[2].length === 4) {
+      // Formato: DD-MM-YYYY ou MM-DD-YYYY (vamos assumir DD-MM-YYYY como mais comum no Brasil)
+      [dia, mes, ano] = partes;
+    } else {
+      return null; // Formato não identificado
+    }
+
+    // Ajuste para garantir dois dígitos
+    mes = mes.padStart(2, '0');
+    dia = dia.padStart(2, '0');
+
+    const dataFormatada = `${ano}-${mes}-${dia}`;
+    const dataObj = new Date(dataFormatada);
+
+    return isNaN(dataObj.getTime()) ? null : dataObj;
+  }
+
+  return null; // Formato inválido
+}
+
+const calcularIdade = (dataNascimento) => {
+  if (!dataNascimento) return null;
+
+  console.log(dataNascimento)
+
+  // Tenta substituir separadores comuns por "-"
+  const dataLimpa = dataNascimento.replace(/[./]/g, '-').trim();
+
+  // Tenta identificar o formato e reorganizar para YYYY-MM-DD
+  let partes = dataLimpa.split('-');
+
+  // Se vier no formato DD-MM-YYYY ou MM-DD-YYYY
+  if (partes.length === 3) {
+    const [a, b, c] = partes;
+
+    if (a.length === 4) {
+      // Já está no formato YYYY-MM-DD
+      dataFormatada = `${a}-${b.padStart(2, '0')}-${c.padStart(2, '0')}`;
+    } else if (c.length === 4) {
+      // Provavelmente está em DD-MM-YYYY ou MM-DD-YYYY
+      dataFormatada = `${c}-${b.padStart(2, '0')}-${a.padStart(2, '0')}`;
+    } else {
+      return null; // Formato inválido
+    }
+  } else {
+    return null; // Formato inválido
+  }
+
+  const nascimento = new Date(dataFormatada);
+  if (isNaN(nascimento)) return null;
+
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nascimento.getFullYear();
+
+  const mesAtual = hoje.getMonth();
+  const diaAtual = hoje.getDate();
+  const mesNasc = nascimento.getMonth();
+  const diaNasc = nascimento.getDate();
+
+  if (mesAtual < mesNasc || (mesAtual === mesNasc && diaAtual < diaNasc)) {
+    idade--;
+  }
+
+  return idade;
+}
+
 const normalizarGenero = (genero) => {
   if (!genero || typeof genero !== 'string') return genero;
 
@@ -360,9 +440,9 @@ router.post('/import', validateToken, async (req, res) => {
         params[`${paramPrefix}_email`] = lead.email || '';
         params[`${paramPrefix}_celular`] = ("" + lead.celular) || '';
         params[`${paramPrefix}_cpf`] = lead.cpf || '';
-        params[`${paramPrefix}_nascimento`] = lead.nascimento ? new Date(lead.nascimento) : null;
+        params[`${paramPrefix}_nascimento`] = lead.nascimento ? new Date(converterParaData(lead.nascimento)) : null;
         params[`${paramPrefix}_genero`] = normalizarGenero(lead.genero) || '';
-        params[`${paramPrefix}_idade`] = lead.idade ? parseInt(lead.idade, 10) : null;
+        params[`${paramPrefix}_idade`] = lead.idade ? parseInt(lead.idade, 10) : lead.nascimento ? calcularIdade(lead.nascimento) : null;
         params[`${paramPrefix}_estado`] = normalizarEstado(lead.estado) || '';
         params[`${paramPrefix}_cidade`] = lead.cidade || '';
         params[`${paramPrefix}_bairro`] = lead.bairro || '';

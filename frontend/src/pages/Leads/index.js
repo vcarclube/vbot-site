@@ -36,6 +36,7 @@ const Leads = () => {
     const [importColumns, setImportColumns] = useState({});
     const [importLoading, setImportLoading] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
+    const [importHeaders, setImportHeaders] = useState([]);
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -341,6 +342,7 @@ const Leads = () => {
                 // Dados (excluindo a primeira linha)
                 const rows = json.slice(1, 11); // Mostrar apenas as 10 primeiras linhas na prévia
 
+                setImportHeaders(headers);
                 setImportPreview(rows);
 
                 // Inicializar mapeamento de colunas
@@ -400,7 +402,23 @@ const Leads = () => {
             return;
         }
 
-        if (importColumns.nome != "" && importColumns.celular != "") {
+        const tipoValido = (valor) => {
+            if (valor === null || valor === undefined) {
+              return false;
+            }
+          
+            if (typeof valor === 'string') {
+              return valor.trim() !== '';
+            }
+          
+            if (typeof valor === 'number') {
+              return !isNaN(valor);
+            }
+          
+            return false;
+        }
+
+        if (!tipoValido(importColumns.nome) || !tipoValido(importColumns.celular)) {
             toast.error('Os campos Nome e Celular são obrigatórios para importação.');
             return;
         }
@@ -999,8 +1017,8 @@ const Leads = () => {
                                     <table className="import-table">
                                         <thead>
                                             <tr>
-                                                {importPreview[0]?.map((_, index) => (
-                                                    <th key={index}>Coluna {index + 1}</th>
+                                                {importPreview[0]?.map((item, index) => (
+                                                    <th key={index}>{importHeaders[index]}</th>
                                                 ))}
                                             </tr>
                                         </thead>
@@ -1030,7 +1048,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1043,7 +1061,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1056,7 +1074,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1069,7 +1087,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1082,7 +1100,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1095,7 +1113,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1108,7 +1126,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1121,7 +1139,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1134,7 +1152,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1147,7 +1165,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1171,7 +1189,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
@@ -1184,7 +1202,7 @@ const Leads = () => {
                                         >
                                             <option value="">Selecione a coluna</option>
                                             {importPreview[0]?.map((_, index) => (
-                                                <option key={index} value={index}>Coluna {index + 1}</option>
+                                                <option key={index} value={index}>{importHeaders[index]}</option>
                                             ))}
                                         </Select>
                                     </div>
