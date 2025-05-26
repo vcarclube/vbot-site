@@ -4,6 +4,18 @@ const db = require('../database');
 const { validateToken } = require('../middlewares/AuthMiddleware');
 const { v4: uuidv4 } = require('uuid');
 
+const normalizarGenero = (genero) => {
+  if (!genero || typeof genero !== 'string') return genero;
+
+  const valor = genero.trim().toUpperCase();
+
+  if (valor === 'M') return 'Masculino';
+  if (valor === 'F') return 'Feminino';
+
+  // Se já vier como nome ou outro valor, retorna como está
+  return genero;
+}
+
 const normalizarEstado = (estado) => {
   const estados = {
     AC: "Acre",
@@ -349,7 +361,7 @@ router.post('/import', validateToken, async (req, res) => {
         params[`${paramPrefix}_celular`] = ("" + lead.celular) || '';
         params[`${paramPrefix}_cpf`] = lead.cpf || '';
         params[`${paramPrefix}_nascimento`] = lead.nascimento ? new Date(lead.nascimento) : null;
-        params[`${paramPrefix}_genero`] = lead.genero || '';
+        params[`${paramPrefix}_genero`] = normalizarGenero(lead.genero) || '';
         params[`${paramPrefix}_idade`] = lead.idade ? parseInt(lead.idade, 10) : null;
         params[`${paramPrefix}_estado`] = normalizarEstado(lead.estado) || '';
         params[`${paramPrefix}_cidade`] = lead.cidade || '';
