@@ -41,8 +41,6 @@ const converterParaData = (entrada) => {
 const calcularIdade = (dataNascimento) => {
   if (!dataNascimento) return null;
 
-  console.log(dataNascimento)
-
   // Tenta substituir separadores comuns por "-"
   const dataLimpa = dataNascimento.replace(/[./]/g, '-').trim();
 

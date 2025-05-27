@@ -909,10 +909,11 @@ const Leads = () => {
                             >
                                 <option value="">Selecione</option>
                                 <option key={0} value={"Prospecção"}>Prospecção</option>
-                                <option key={1} value={"Interessado"}>Interessado</option>
-                                <option key={2} value={"Convencido"}>Convencido</option>
-                                <option key={3} value={"Aquisição"}>Aquisição</option>
-                                <option key={4} value={"Pós-aquisição"}>Pós-aquisição</option>
+                                <option key={1} value={"Indeciso"}>Indeciso</option>
+                                <option key={2} value={"Interessado"}>Interessado</option>
+                                <option key={3} value={"Convencido"}>Convencido</option>
+                                <option key={4} value={"Aquisição"}>Aquisição</option>
+                                <option key={5} value={"Pós-aquisição"}>Pós-aquisição</option>
                             </Select>
                         </div>
                     </div>
