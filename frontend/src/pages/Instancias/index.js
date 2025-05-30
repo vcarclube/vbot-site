@@ -101,20 +101,28 @@ const Instancias = () => {
             <span>Conectado</span>
           </div>
         );
-      case 'disconnected':
+      case 'Disconected':
         return (
           <div className="instance-status disconnected">
             <i className="fas fa-times-circle"></i>
             <span>Desconectado</span>
           </div>
         );
-      case 'Aguardando escaneamento do QR Code':
+      case 'Aguardando':
         return (
           <div className="instance-status qrcode">
             <i className="fas fa-qrcode"></i>
             <span>Aguardando QR Code</span>
           </div>
         );
+      case 'Inicializando':
+        return (
+          <div className="instance-status qrcode">
+            <i className="fas fa-qrcode"></i>
+            <span>Aguardando QR Code</span>
+          </div>
+        );
+        break;
       case 'loading':
         return (
           <div className="instance-status loading">
@@ -213,41 +221,90 @@ const Instancias = () => {
             {filteredInstancias.map(instancia => (
               <Card key={instancia.Id} className="instancia-card">
                 <div className="instancia-header">
-                  <h3 className="instancia-name">{instancia.Nome}</h3>
-                  {renderStatus(instancia.Status)}
+                  <h3 className="instancia-name">{instancia.Name}</h3>
+                  {renderStatus(
+                    instancia.Status == "Conectado" && instancia.StatusAutomacao == "Conectado" ? "Conectado" :
+                    instancia.Status == "Aguardando escaneamento do QR Code" && instancia?.StatusAutomacao == "Inicializando" ? "Aguardando" : "Aguardando"
+                  )}
                 </div>
                 
-                <div className="instancia-content">
-                  {instancia.Status === 'Aguardando escaneamento do QR Code' && instancia.QrCodeBase64 ? (
-                    <div className="instancia-qrcode">
-                      <img 
-                        src={"data:image/png;base64,"+instancia.QrCodeBase64} 
-                        alt="QR Code para conexão" 
-                        className="qrcode-image" 
-                      />
-                      <p className="qrcode-instruction">
-                        Escaneie o QR Code com seu WhatsApp para conectar
-                      </p>
+                <div style={{display: 'flex', alignContent: 'center', justifyContent: 'center'}}>
+                  <div>
+                    <div style={{color: "gray", marginTop: "15px", fontSize: '10pt', textAlign: 'center'}}>
+                      <b>Disparador</b>
                     </div>
-                  ) : instancia.Status === 'Conectado' ? (
-                    <div className="instancia-connected">
-                      <div className="connected-icon">
-                        <i className="fas fa-check-circle"></i>
-                      </div>
-                      <p className="connected-message">
-                        Instância conectada e pronta para uso
-                      </p>
+                    <div className="instancia-content">
+                      {instancia.Status === 'Aguardando escaneamento do QR Code' && instancia.QrCodeBase64 ? (
+                        <div className="instancia-qrcode">
+                          <img 
+                            src={"data:image/png;base64,"+instancia.QrCodeBase64} 
+                            alt="QR Code para conexão" 
+                            className="qrcode-image" 
+                          />
+                          <p className="qrcode-instruction">
+                            Escaneie o QR Code com seu WhatsApp para conectar
+                          </p>
+                        </div>
+                      ) : instancia.Status === 'Conectado' ? (
+                        <div className="instancia-connected">
+                          <div className="connected-icon">
+                            <i className="fas fa-check-circle"></i>
+                          </div>
+                          <p className="connected-message">
+                            Instância conectada e pronta para uso
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="instancia-disconnected">
+                          <div className="disconnected-icon">
+                            <i className="fas fa-plug"></i>
+                          </div>
+                          <p className="disconnected-message">
+                            Instância desconectada. Aguardando inicialização...
+                          </p>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="instancia-disconnected">
-                      <div className="disconnected-icon">
-                        <i className="fas fa-plug"></i>
-                      </div>
-                      <p className="disconnected-message">
-                        Instância desconectada. Aguardando inicialização...
-                      </p>
+                  </div>
+                  
+                  <div>
+                    <div style={{color: "gray", marginTop: "15px", fontSize: '10pt', textAlign: 'center'}}>
+                      <b>Automação</b>
                     </div>
-                  )}
+                    <div className="instancia-content">
+                      {instancia.StatusAutomacao === 'Inicializando' && instancia.QrCodeBase64Automacao ? (
+                        <div className="instancia-qrcode">
+                          <img 
+                            src={"data:image/png;base64,"+instancia.QrCodeBase64Automacao} 
+                            alt="QR Code para conexão" 
+                            className="qrcode-image" 
+                            style={{padding: '12px'}}
+                          />
+                          <p className="qrcode-instruction">
+                            Escaneie o QR Code com seu WhatsApp para conectar
+                          </p>
+                        </div>
+                      ) : instancia.StatusAutomacao === 'Conectado' ? (
+                        <div className="instancia-connected">
+                          <div className="connected-icon">
+                            <i className="fas fa-check-circle"></i>
+                          </div>
+                          <p className="connected-message">
+                            Instância conectada e pronta para uso
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="instancia-disconnected">
+                          <div className="disconnected-icon">
+                            <i className="fas fa-plug"></i>
+                          </div>
+                          <p className="disconnected-message">
+                            Instância desconectada. Aguardando inicialização...
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="instancia-info">

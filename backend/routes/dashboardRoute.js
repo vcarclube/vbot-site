@@ -76,7 +76,7 @@ router.get('/summary', validateToken, async (req, res) => {
     const instanciasQuery = `
       SELECT COUNT(*) as instanciasAtivas
       FROM WhatsAppInstances
-      WHERE IdUser = @idUser AND Status = 'CONNECTED'
+      WHERE IdUser = @idUser AND Status = 'Conectado'
     `;
     const instanciasResult = await db.query(instanciasQuery, { idUser: req.user.id });
 
