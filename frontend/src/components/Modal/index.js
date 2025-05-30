@@ -18,7 +18,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'medium' }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay">
       <div 
         className={`modal-container modal-${size}`} 
         onClick={e => e.stopPropagation()}
