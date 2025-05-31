@@ -376,7 +376,7 @@ const Conversations = () => {
                                             style={{ backgroundColor: generateAvatar(selectedConversation.name).color }}
                                         >
                                             <span className="avatar-text">{generateAvatar(selectedConversation.name).initial}</span>
-                                            <span className={`status-indicator ${selectedConversation.status === 'Enviado' ? 'online' : 'offline'}`}></span>
+                                            <span className={`status-indicator ${'online'}`}></span>
                                         </div>
                                         <div className="chat-contact-details">
                                             <h3 className="chat-contact-name">
