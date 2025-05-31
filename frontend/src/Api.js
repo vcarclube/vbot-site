@@ -2,6 +2,7 @@ import axios from "axios";
 import Environment from "./Environment";
 
 const API_BASE = Environment.API_BASE;
+const API_AUTOMATION = Environment.API_AUTOMATION;
 
 const Api = {
 
@@ -380,6 +381,54 @@ const Api = {
             return { success: false, error: error.response?.data?.message || 'Erro ao buscar distribuição por idade' };
         }
     },
+
+    // Obter todas as conversas
+    getConversations: async () => {
+        try {
+            const response = await axios.get(`${API_BASE}/conversations`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('Erro ao buscar conversas:', error);
+            return { success: false, error };
+        }
+    },
+    
+    // Obter mensagens de uma conversa específica
+    getConversationMessages: async (phoneNumber) => {
+        try {
+            const response = await axios.get(`${API_BASE}/conversations/${phoneNumber}`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('Erro ao buscar mensagens da conversa:', error);
+            return { success: false, error };
+        }
+    },
+    
+    // Enviar mensagem para uma conversa
+    sendMessage: async (phoneNumber, message, campaignId = null, leadId = null) => {
+        try {
+            const response = await axios.post(
+                `${API_AUTOMATION}/api/send-message`,
+                { instanceName: "Bot-20250530-154830", phoneNumber, message, campaignId, leadId },
+            );
+
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('Erro ao enviar mensagem:', error);
+            return { success: false, error };
+        }
+    },
+    
+    // Obter detalhes de um contato
+    getContactDetails: async (phoneNumber) => {
+        try {
+            const response = await axios.get(`${API_BASE}/conversations/${phoneNumber}/details`, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('Erro ao buscar detalhes do contato:', error);
+            return { success: false, error };
+        }
+    }
 
 }
 

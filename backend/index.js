@@ -19,6 +19,7 @@ const instanciasRoute = require('./routes/instanciasRoute');
 const analyticsRoute = require('./routes/analyticsRoute');
 const automacoesRoute = require('./routes/automacoesRoute');
 const dashboardRoute = require('./routes/dashboardRoute');
+const conversationsRoute = require('./routes/conversationsRoute');
 
 app.use('/users', usersRoute);
 app.use('/leads', leadsRoute);
@@ -27,6 +28,7 @@ app.use('/instancias', instanciasRoute);
 app.use('/analytics', analyticsRoute);
 app.use('/automacoes', automacoesRoute);
 app.use('/dashboard', dashboardRoute);
+app.use('/conversations', conversationsRoute);
 
 if(process.env.DEVELOPMENT_MODE == "true"){
     var httpServer = http.createServer(app);

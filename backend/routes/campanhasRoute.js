@@ -145,7 +145,7 @@ router.post('/', validateToken, async (req, res) => {
         // Inserir leads na tabela Leads
         if (importedLeads.length > 0) {
             const leadValues = importedLeads.map(lead =>
-                `('${uuidv4()}', '${campaignId}', '${lead.Nome.replace(/'/g, "''")}', '${lead.Celular}', 'Pendente', null)`
+                `('${uuidv4()}', '${campaignId}', '${lead.Nome.replace(/'/g, "''")}', '${lead.Celular?.replace("(","")?.replace(")", "")?.replace("-", "")?.replace(" ", "")}', 'Pendente', null)`
             ).join(", ");
 
             const insertLeadsQuery = `

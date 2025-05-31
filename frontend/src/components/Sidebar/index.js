@@ -68,18 +68,25 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       priority: 4
     },
     {
+      id: 'conversations',
+      label: 'Conversas',
+      icon: 'fa-solid fa-comments',
+      path: '/conversations',
+      priority: 6
+    },
+    {
       id: 'instances',
       label: 'Instâncias',
       icon: 'fas fa-server',
       path: '/instances',
-      priority: 6
+      priority: 5
     },
     {
       id: 'analytics',
       label: 'Analytics',
       icon: 'fas fa-chart-line',
       path: '/analytics',
-      priority: 5
+      priority: 6
     },
     {
       id: 'settings',

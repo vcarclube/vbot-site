@@ -7,7 +7,7 @@ import Api from './Api';
 import Utils from './Utils';
 
 // Importação de páginas
-import { Analytics, Automacao, Campanhas, Home, Instancias, Leads, Login, PageNotFound, Settings } from './pages';
+import { Analytics, Automacao, Campanhas, Conversations, Home, Instancias, Leads, Login, PageNotFound, Settings } from './pages';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import LoadingScreen from './components/LoadingScreen';
@@ -224,6 +224,15 @@ function App() {
             } 
           />
           
+          <Route 
+            path="/conversations" 
+            element={
+              <PrivateRoute>
+                <Conversations/>
+              </PrivateRoute>
+            } 
+          />
+
           {/* Rota para página não encontrada */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>
