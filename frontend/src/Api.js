@@ -394,9 +394,9 @@ const Api = {
     },
     
     // Obter mensagens de uma conversa específica
-    getConversationMessages: async (id) => {
+    getConversationMessages: async (instanceName, phoneNumber) => {
         try {
-            const response = await axios.get(`${API_BASE}/conversations/${id}`, Environment.HEADERS);
+            const response = await axios.get(`${API_BASE}/conversations/${instanceName}/${phoneNumber}`, Environment.HEADERS);
             return { success: true, data: response.data };
         } catch (error) {
             console.error('Erro ao buscar mensagens da conversa:', error);
@@ -422,7 +422,7 @@ const Api = {
     // Obter detalhes de um contato
     getContactDetails: async (phoneNumber) => {
         try {
-            const response = await axios.get(`${API_BASE}/conversations/${phoneNumber}/details`, Environment.HEADERS);
+            const response = await axios.get(`${API_BASE}/conversations/details/lead/${phoneNumber}`, Environment.HEADERS);
             return { success: true, data: response.data };
         } catch (error) {
             console.error('Erro ao buscar detalhes do contato:', error);

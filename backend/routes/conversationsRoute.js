@@ -8,12 +8,17 @@ router.get('/', validateToken, async (req, res) => {
     try {
         const query = `
             SELECT 
-                i1.id,
+                (
+                    SELECT TOP 1 i2.id
+                    FROM [vcarclub_vbot].[vcarclube].[Interacoes] i2
+                    WHERE i2.phoneNumber = i1.phoneNumber
+                    AND i2.instanceName = i1.instanceName
+                    ORDER BY i2.createdAt DESC
+                ) AS id,
                 i1.phoneNumber,
                 i1.campaignId,
                 i1.instanceName,
                 MAX(i1.createdAt) AS lastMessageTime,
-
                 (
                     SELECT TOP 1 
                         CASE 
@@ -25,7 +30,6 @@ router.get('/', validateToken, async (req, res) => {
                     AND i2.instanceName = i1.instanceName
                     ORDER BY i2.createdAt DESC
                 ) AS lastMessage,
-
                 (
                     SELECT TOP 1 i2.leadId
                     FROM [vcarclub_vbot].[vcarclube].[Interacoes] i2
@@ -34,19 +38,17 @@ router.get('/', validateToken, async (req, res) => {
                     AND i2.leadId IS NOT NULL
                     ORDER BY i2.createdAt DESC
                 ) AS leadId,
-
                 (
                     SELECT COUNT(*)
                     FROM [vcarclub_vbot].[vcarclube].[Interacoes] i2
                     WHERE i2.phoneNumber = i1.phoneNumber
                     AND i2.instanceName = i1.instanceName
                 ) AS messageCount
-
             FROM [vcarclub_vbot].[vcarclube].[Interacoes] i1
             WHERE i1.campaignId IN (
                 SELECT id FROM Campaigns WHERE idUser = @idUser
             )
-            GROUP BY i1.phoneNumber, i1.campaignId, i1.instanceName, i1.id
+            GROUP BY i1.phoneNumber, i1.campaignId, i1.instanceName
             ORDER BY lastMessageTime DESC
         `;
 
@@ -101,9 +103,9 @@ router.get('/', validateToken, async (req, res) => {
 });
 
 // Obter mensagens de uma conversa específica
-router.get('/:id', validateToken, async (req, res) => {
+router.get('/:instanceName/:phoneNumber', validateToken, async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id, instanceName, phoneNumber } = req.params;
         
         const query = `
             SELECT 
@@ -115,11 +117,12 @@ router.get('/:id', validateToken, async (req, res) => {
                 campaignId,
                 leadId
             FROM [vcarclub_vbot].[vcarclube].[Interacoes]
-            WHERE id = @id
+            WHERE phoneNumber = @phoneNumber
+            AND instanceName = @instanceName
             ORDER BY createdAt ASC
         `;
         
-        const result = await db.query(query, { id });
+        const result = await db.query(query, { instanceName: instanceName, phoneNumber: phoneNumber });
         
         // Formatar mensagens para o formato esperado pelo frontend
         const messages = result.recordsets[0].map(msg => {
@@ -232,27 +235,10 @@ router.post('/:phoneNumber/send', validateToken, async (req, res) => {
 });
 
 // Buscar detalhes de um contato específico
-router.get('/:phoneNumber/details', validateToken, async (req, res) => {
+router.get('/details/lead/:phoneNumber', validateToken, async (req, res) => {
     try {
         const { phoneNumber } = req.params;
-        
-        const accessCheckQuery = `
-            SELECT COUNT(*) as count
-            FROM [vcarclub_vbot].[vcarclube].[Interacoes] i
-            JOIN Campaigns c ON i.campaignId = c.id
-            WHERE i.phoneNumber = @phoneNumber
-            AND c.idUser = @idUser
-        `;
-        
-        const accessCheck = await db.query(accessCheckQuery, { 
-            phoneNumber, 
-            idUser: req.user.id 
-        });
-        
-        if (!accessCheck.recordsets[0][0].count) {
-            return res.status(403).json({ message: 'Acesso negado a este contato' });
-        }
-        
+
         const leadQuery = `
             SELECT 
                 l.id,

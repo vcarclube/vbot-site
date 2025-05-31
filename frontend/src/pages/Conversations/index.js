@@ -19,6 +19,7 @@ const Conversations = () => {
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const messageEndRef = useRef(null);
+    const selectedConversationRef = useRef(null);
 
     // Constante para o intervalo de atualização (em milissegundos)
     const UPDATE_INTERVAL = 10000; // 10 segundos
@@ -30,16 +31,30 @@ const Conversations = () => {
             const response = await Api.getConversations();
 
             if (response.success) {
+                // Guardar a referência da conversa selecionada
+                const currentSelectedId = selectedConversation?.id;
+                const currentSelectedPhone = selectedConversation?.phoneNumber;
+                
+                // Atualizar a lista de conversas
                 setConversations(response.data);
-
-                // Se já tiver uma conversa selecionada, atualize suas informações
-                if (selectedConversation) {
+                
+                // Se havia uma conversa selecionada, encontre-a na nova lista
+                if (currentSelectedId || currentSelectedPhone) {
                     const updatedConversation = response.data.find(
-                        conv => conv.id === selectedConversation.id
+                        conv => (currentSelectedId && conv.id === currentSelectedId) || 
+                               (currentSelectedPhone && conv.phoneNumber === currentSelectedPhone)
                     );
 
+                    // Se encontrou, atualize a conversa selecionada mantendo a seleção
                     if (updatedConversation) {
+                        // Atualizar a referência primeiro
+                        selectedConversationRef.current = updatedConversation.id;
+                        
+                        // Atualizar o estado com a conversa atualizada
                         setSelectedConversation(updatedConversation);
+                        
+                        // Buscar mensagens atualizadas para a conversa selecionada
+                        fetchMessages(updatedConversation.instanceName, updatedConversation.phoneNumber);
                     }
                 }
             } else {
@@ -84,10 +99,25 @@ const Conversations = () => {
 
     // Buscar mensagens quando uma conversa é selecionada
     useEffect(() => {
-        if (selectedConversation) {
-            fetchMessages(selectedConversation.id);
+        if (selectedConversation && selectedConversationRef.current === selectedConversation.id) {
+            fetchMessages(selectedConversation.instanceName, selectedConversation.phoneNumber);
             fetchContactDetails(selectedConversation.phoneNumber);
         }
+    }, [selectedConversation]);
+
+    // Atualizar mensagens periodicamente se houver uma conversa selecionada
+    useEffect(() => {
+        if (!selectedConversation) return;
+        
+        // Configurar intervalo para atualização automática das mensagens
+        const messageIntervalId = setInterval(() => {
+            if (selectedConversation && selectedConversationRef.current === selectedConversation.id) {
+                fetchMessages(selectedConversation.instanceName, selectedConversation.phoneNumber);
+            }
+        }, UPDATE_INTERVAL);
+        
+        // Limpar intervalo ao desmontar o componente ou mudar de conversa
+        return () => clearInterval(messageIntervalId);
     }, [selectedConversation]);
 
     // Rolar para o final da conversa quando novas mensagens são carregadas
@@ -98,13 +128,15 @@ const Conversations = () => {
     }, [messages]);
 
     // Função para buscar mensagens
-    const fetchMessages = async (id) => {
+    const fetchMessages = async (instanceName, phoneNumber) => {
         try {
-            const response = await Api.getConversationMessages(id);
+            const currentSelectedId = selectedConversationRef.current;
+            
+            const response = await Api.getConversationMessages(instanceName, phoneNumber);
 
-            if (response.success) {
+            if (response.success && selectedConversationRef.current === currentSelectedId) {
                 setMessages(response.data);
-            } else {
+            } else if (!response.success) {
                 console.error('Erro ao carregar mensagens:', response.error);
                 toast.error('Não foi possível carregar as mensagens');
             }
@@ -119,11 +151,13 @@ const Conversations = () => {
     // Função para buscar detalhes do contato
     const fetchContactDetails = async (phoneNumber) => {
         try {
+            const currentSelectedId = selectedConversationRef.current;
+            
             const response = await Api.getContactDetails(phoneNumber);
 
-            if (response.success) {
+            if (response.success && selectedConversationRef.current === currentSelectedId) {
                 setContactDetails(response.data);
-            } else {
+            } else if (!response.success) {
                 console.error('Erro ao carregar detalhes do contato:', response.error);
             }
         } catch (error) {
@@ -154,7 +188,7 @@ const Conversations = () => {
                 // Atualizar a última mensagem na lista de conversas
                 setConversations(prev =>
                     prev.map(conv =>
-                        conv.phoneNumber === selectedConversation.phoneNumber
+                        conv.id === selectedConversation.id
                             ? {
                                 ...conv,
                                 lastMessage: newMessage,
@@ -293,10 +327,14 @@ const Conversations = () => {
                                     return (
                                         <div
                                             key={conversation.id}
-                                            className={`conversation-item ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
+                                            className={`conversation-item ${selectedConversationRef.current === conversation.id ? 'selected' : ''}`}
                                             onClick={() => { 
                                                 setIsLoadingMessages(true);
+                                                // Atualizar a referência quando selecionar uma conversa
+                                                selectedConversationRef.current = conversation.id;
                                                 setSelectedConversation(conversation);
+                                                fetchMessages(conversation.instanceName, conversation.phoneNumber);
+                                                fetchContactDetails(conversation.phoneNumber);
                                             }}
                                         >
 
@@ -328,7 +366,6 @@ const Conversations = () => {
                         </div>
                     </div>
 
-                    {/* Área de Chat */}
                     <div className="chat-area">
                         {selectedConversation ? (
                             <>
@@ -357,6 +394,18 @@ const Conversations = () => {
                                         </button>
                                         <button className="chat-action-btn" title="Anexar arquivo">
                                             <i className="fas fa-paperclip"></i>
+                                        </button>
+                                        <button 
+                                            className="chat-action-btn" 
+                                            title="Atualizar conversa"
+                                            onClick={() => {
+                                                if (selectedConversation) {
+                                                    setIsLoadingMessages(true);
+                                                    fetchMessages(selectedConversation.instanceName, selectedConversation.phoneNumber);
+                                                }
+                                            }}
+                                        >
+                                            <i className="fas fa-sync-alt"></i>
                                         </button>
                                         <button className="chat-action-btn" title="Mais opções">
                                             <i className="fas fa-ellipsis-v"></i>
@@ -477,6 +526,13 @@ const Conversations = () => {
                                     <div className="contact-info-item">
                                         <i className="fas fa-bullhorn"></i>
                                         <span>Campanha: {contactDetails.campaignName}</span>
+                                    </div>
+                                )}
+
+                                {selectedConversation && (
+                                    <div className="contact-info-item">
+                                        <i className="fas fa-server"></i>
+                                        <span>Instância: {selectedConversation.instanceName}</span>
                                     </div>
                                 )}
 
