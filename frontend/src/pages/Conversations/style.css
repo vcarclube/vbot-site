@@ -56,6 +56,11 @@
     border-bottom: 1px solid var(--gray-100);
     cursor: pointer;
     transition: all var(--transition);
+    align-items: center;
+}
+
+.search-input{
+    margin-bottom: 0px !important;
 }
 
 .conversation-item:hover {
@@ -624,7 +629,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-md);
+    padding: 25px var(--spacing-md);
     border-bottom: 1px solid var(--gray-200);
   }
   

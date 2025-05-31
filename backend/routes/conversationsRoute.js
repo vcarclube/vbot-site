@@ -8,36 +8,46 @@ router.get('/', validateToken, async (req, res) => {
     try {
         const query = `
             SELECT 
-                phoneNumber,
+                i1.id,
+                i1.phoneNumber,
                 i1.campaignId,
-                MAX(createdAt) as lastMessageTime,
+                i1.instanceName,
+                MAX(i1.createdAt) AS lastMessageTime,
+
                 (
                     SELECT TOP 1 
                         CASE 
-                            WHEN userMessage IS NOT NULL THEN userMessage 
-                            ELSE botResponse 
+                            WHEN i2.userMessage IS NOT NULL THEN i2.userMessage 
+                            ELSE i2.botResponse 
                         END
                     FROM [vcarclub_vbot].[vcarclube].[Interacoes] i2
                     WHERE i2.phoneNumber = i1.phoneNumber
-                    ORDER BY createdAt DESC
-                ) as lastMessage,
+                    AND i2.instanceName = i1.instanceName
+                    ORDER BY i2.createdAt DESC
+                ) AS lastMessage,
+
                 (
-                    SELECT TOP 1 leadId
+                    SELECT TOP 1 i2.leadId
                     FROM [vcarclub_vbot].[vcarclube].[Interacoes] i2
-                    WHERE i2.phoneNumber = i1.phoneNumber AND i2.leadId IS NOT NULL
-                    ORDER BY createdAt DESC
-                ) as leadId,
+                    WHERE i2.phoneNumber = i1.phoneNumber 
+                    AND i2.instanceName = i1.instanceName
+                    AND i2.leadId IS NOT NULL
+                    ORDER BY i2.createdAt DESC
+                ) AS leadId,
+
                 (
                     SELECT COUNT(*)
                     FROM [vcarclub_vbot].[vcarclube].[Interacoes] i2
                     WHERE i2.phoneNumber = i1.phoneNumber
-                ) as messageCount
-                FROM [vcarclub_vbot].[vcarclube].[Interacoes] i1
-                WHERE campaignId IN (
+                    AND i2.instanceName = i1.instanceName
+                ) AS messageCount
+
+            FROM [vcarclub_vbot].[vcarclube].[Interacoes] i1
+            WHERE i1.campaignId IN (
                 SELECT id FROM Campaigns WHERE idUser = @idUser
-                )
-                GROUP BY phoneNumber, i1.campaignId
-                ORDER BY lastMessageTime DESC
+            )
+            GROUP BY i1.phoneNumber, i1.campaignId, i1.instanceName, i1.id
+            ORDER BY lastMessageTime DESC
         `;
 
         const result = await db.query(query, { idUser: req.user.id });
@@ -70,7 +80,8 @@ router.get('/', validateToken, async (req, res) => {
             }
             
             return {
-                id: conversation.phoneNumber, // Usando o número como ID
+                id: conversation.id, // Usando o número como ID
+                instanceName: conversation.instanceName,
                 campaignId: conversation.campaignId,
                 phoneNumber: conversation.phoneNumber,
                 name: leadInfo.name || conversation.phoneNumber, // Nome do lead ou número se não tiver
@@ -90,27 +101,9 @@ router.get('/', validateToken, async (req, res) => {
 });
 
 // Obter mensagens de uma conversa específica
-router.get('/:phoneNumber', validateToken, async (req, res) => {
+router.get('/:id', validateToken, async (req, res) => {
     try {
-        const { phoneNumber } = req.params;
-        
-        // Verificar se o usuário tem acesso a esta conversa
-        const accessCheckQuery = `
-            SELECT COUNT(*) as count
-            FROM [vcarclub_vbot].[vcarclube].[Interacoes] i
-            JOIN Campaigns c ON i.campaignId = c.id
-            WHERE i.phoneNumber = @phoneNumber
-            AND c.idUser = @idUser
-        `;
-        
-        const accessCheck = await db.query(accessCheckQuery, { 
-            phoneNumber, 
-            idUser: req.user.id 
-        });
-        
-        if (!accessCheck.recordsets[0][0].count) {
-            return res.status(403).json({ message: 'Acesso negado a esta conversa' });
-        }
+        const { id } = req.params;
         
         const query = `
             SELECT 
@@ -122,11 +115,11 @@ router.get('/:phoneNumber', validateToken, async (req, res) => {
                 campaignId,
                 leadId
             FROM [vcarclub_vbot].[vcarclube].[Interacoes]
-            WHERE phoneNumber = @phoneNumber
+            WHERE id = @id
             ORDER BY createdAt ASC
         `;
         
-        const result = await db.query(query, { phoneNumber });
+        const result = await db.query(query, { id });
         
         // Formatar mensagens para o formato esperado pelo frontend
         const messages = result.recordsets[0].map(msg => {
@@ -136,7 +129,7 @@ router.get('/:phoneNumber', validateToken, async (req, res) => {
             if (msg.userMessage) {
                 messages.push({
                     id: `${msg.id}-user`,
-                    conversationId: phoneNumber,
+                    conversationId: id,
                     text: msg.userMessage,
                     timestamp: msg.createdAt,
                     sender: 'contact', // Mensagem do contato
@@ -148,7 +141,7 @@ router.get('/:phoneNumber', validateToken, async (req, res) => {
             if (msg.botResponse) {
                 messages.push({
                     id: `${msg.id}-bot`,
-                    conversationId: phoneNumber,
+                    conversationId: id,
                     text: msg.botResponse,
                     timestamp: msg.createdAt,
                     sender: 'user', // Mensagem do sistema (aparece como nossa)

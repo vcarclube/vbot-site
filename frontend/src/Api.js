@@ -394,9 +394,9 @@ const Api = {
     },
     
     // Obter mensagens de uma conversa específica
-    getConversationMessages: async (phoneNumber) => {
+    getConversationMessages: async (id) => {
         try {
-            const response = await axios.get(`${API_BASE}/conversations/${phoneNumber}`, Environment.HEADERS);
+            const response = await axios.get(`${API_BASE}/conversations/${id}`, Environment.HEADERS);
             return { success: true, data: response.data };
         } catch (error) {
             console.error('Erro ao buscar mensagens da conversa:', error);
@@ -405,11 +405,11 @@ const Api = {
     },
     
     // Enviar mensagem para uma conversa
-    sendMessage: async (phoneNumber, message, campaignId = null, leadId = null) => {
+    sendMessage: async (instanceName, phoneNumber, message, campaignId = null, leadId = null) => {
         try {
             const response = await axios.post(
                 `${API_AUTOMATION}/api/send-message`,
-                { instanceName: "Bot-20250530-154830", phoneNumber, message, campaignId, leadId },
+                { instanceName, phoneNumber, message, campaignId, leadId },
             );
 
             return { success: true, data: response.data };

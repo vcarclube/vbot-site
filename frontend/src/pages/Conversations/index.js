@@ -35,7 +35,7 @@ const Conversations = () => {
                 // Se já tiver uma conversa selecionada, atualize suas informações
                 if (selectedConversation) {
                     const updatedConversation = response.data.find(
-                        conv => conv.phoneNumber === selectedConversation.phoneNumber
+                        conv => conv.id === selectedConversation.id
                     );
 
                     if (updatedConversation) {
@@ -85,7 +85,7 @@ const Conversations = () => {
     // Buscar mensagens quando uma conversa é selecionada
     useEffect(() => {
         if (selectedConversation) {
-            fetchMessages(selectedConversation.phoneNumber);
+            fetchMessages(selectedConversation.id);
             fetchContactDetails(selectedConversation.phoneNumber);
         }
     }, [selectedConversation]);
@@ -98,9 +98,9 @@ const Conversations = () => {
     }, [messages]);
 
     // Função para buscar mensagens
-    const fetchMessages = async (phoneNumber) => {
+    const fetchMessages = async (id) => {
         try {
-            const response = await Api.getConversationMessages(phoneNumber);
+            const response = await Api.getConversationMessages(id);
 
             if (response.success) {
                 setMessages(response.data);
@@ -139,6 +139,7 @@ const Conversations = () => {
             setIsSending(true);
 
             const response = await Api.sendMessage(
+                selectedConversation.instanceName,
                 selectedConversation.phoneNumber,
                 newMessage,
                 selectedConversation.campaignId,
@@ -291,19 +292,23 @@ const Conversations = () => {
 
                                     return (
                                         <div
-                                            key={conversation.phoneNumber}
-                                            className={`conversation-item ${selectedConversation?.phoneNumber === conversation.phoneNumber ? 'selected' : ''}`}
+                                            key={conversation.id}
+                                            className={`conversation-item ${selectedConversation?.id === conversation.id ? 'selected' : ''}`}
                                             onClick={() => { 
                                                 setIsLoadingMessages(true);
                                                 setSelectedConversation(conversation);
                                             }}
                                         >
+
                                             <div className="conversation-avatar" style={{ backgroundColor: avatar.color }}>
                                                 <span className="avatar-text">{avatar.initial}</span>
-                                                <span className={`status-indicator ${conversation.status === 'Enviado' ? 'online' : 'offline'}`}></span>
+                                                <span className={`status-indicator ${'online'}`}></span>
                                             </div>
 
                                             <div className="conversation-info">
+
+                                                <b className="avatar-text" style={{fontSize: '7pt', color: 'gray'}}>{conversation?.instanceName}</b>
+
                                                 <div className="conversation-header">
                                                     <h3 className="conversation-name">{conversation.name || formatPhoneNumber(conversation.phoneNumber)}</h3>
                                                     <span className="conversation-time">{formatConversationTime(conversation.timestamp)}</span>
@@ -401,8 +406,8 @@ const Conversations = () => {
                                     </button>
 
                                     <div className="chat-input-container">
-                                        <textarea
-                                            className="chat-input"
+                                        <input
+                                            className="chat-input" 
                                             placeholder="Digite uma mensagem"
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
