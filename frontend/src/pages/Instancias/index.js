@@ -10,6 +10,7 @@ import './style.css';
 const Instancias = () => {
   // Estados
   const [instancias, setInstancias] = useState([]);
+  const [automacoes, setAutomacoes] = useState([]);
   const [filteredInstancias, setFilteredInstancias] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,6 +20,20 @@ const Instancias = () => {
   
   // Constante para o intervalo de atualização (em milissegundos)
   const UPDATE_INTERVAL = 10000; // 10 segundos
+
+  const fetchAutomacoes = useCallback(async () => {
+    try {
+      const response = await Api.getAutomacoes();
+      
+      if (response.success) {
+        setAutomacoes(response.data);
+      } else {
+        console.error('Erro ao carregar automações:', response.error);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar automações:', error);
+    }
+  }, []);
   
   // Função para buscar instâncias
   const fetchInstancias = useCallback(async () => {
@@ -40,6 +55,7 @@ const Instancias = () => {
   // Buscar instâncias ao carregar a página
   useEffect(() => {
     fetchInstancias();
+    fetchAutomacoes();
     
     // Configurar intervalo para atualização automática
     const intervalId = setInterval(() => {
@@ -221,7 +237,7 @@ const Instancias = () => {
             {filteredInstancias.map(instancia => (
               <Card key={instancia.Id} className="instancia-card">
                 <div className="instancia-header">
-                  <h3 className="instancia-name">{instancia.Name}</h3>
+                  <h3 className="instancia-name">{instancia.AutomacaoRefName || instancia.Name}</h3>
                   {renderStatus(
                     instancia.Status == "Conectado" && instancia.StatusAutomacao == "Conectado" ? "Conectado" :
                     instancia.Status == "Aguardando escaneamento do QR Code" && instancia?.StatusAutomacao == "Inicializando" ? "Aguardando" : "Aguardando"
@@ -332,6 +348,7 @@ const Instancias = () => {
                         : 'Nunca'}
                     </span>
                   </div>
+
                 </div>
               </Card>
             ))}
