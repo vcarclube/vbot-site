@@ -3,6 +3,8 @@ import AuthLayout from '../../components/AuthLayout';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
+import Button from '../../components/Button';
+import Modal from '../../components/Modal';
 import { toast } from 'react-toastify';
 import Api from '../../Api';
 import './style.css';
@@ -17,6 +19,11 @@ const Instancias = () => {
   const [filters, setFilters] = useState({
     status: ''
   });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', automacaoId: '' });
+  const [selectedInstancia, setSelectedInstancia] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: '', automacaoId: '' });
   
   // Constante para o intervalo de atualização (em milissegundos)
   const UPDATE_INTERVAL = 10000; // 10 segundos
@@ -56,13 +63,9 @@ const Instancias = () => {
   useEffect(() => {
     fetchInstancias();
     fetchAutomacoes();
-    
-    // Configurar intervalo para atualização automática
     const intervalId = setInterval(() => {
       fetchInstancias();
     }, UPDATE_INTERVAL);
-    
-    // Limpar intervalo ao desmontar o componente
     return () => clearInterval(intervalId);
   }, [fetchInstancias]);
   
@@ -84,7 +87,7 @@ const Instancias = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(instancia => 
-        (instancia.Name && instancia.Name.toLowerCase().includes(term))
+        (instancia.AutomacaoRefName && instancia.AutomacaoRefName.toLowerCase().includes(term))
       );
     }
     
@@ -159,18 +162,101 @@ const Instancias = () => {
   // Formatar número para exibição
   const formatPhoneNumber = (number) => {
     if (!number) return 'Não disponível';
-    
-    // Formatar número como +XX (XX) XXXXX-XXXX
     const cleaned = ('' + number).replace(/\D/g, '');
-    
     if (cleaned.length < 10) return number;
-    
     const countryCode = cleaned.slice(0, 2);
     const areaCode = cleaned.slice(2, 4);
     const firstPart = cleaned.slice(4, 9);
     const secondPart = cleaned.slice(9);
-    
     return `+${countryCode} (${areaCode}) ${firstPart}-${secondPart}`;
+  };
+
+  const openEditModal = (instancia) => {
+    setSelectedInstancia(instancia);
+    setEditForm({
+      name: instancia.AutomacaoRefName || '',
+      automacaoId: instancia.AutomacaoRefId || ''
+    });
+    setShowEditModal(true);
+  };
+
+  const closeEditModal = () => setShowEditModal(false);
+
+  const handleSaveEdit = () => {
+    if (!selectedInstancia) return;
+    const name = (editForm.name || '').trim();
+    const automacaoId = editForm.automacaoId;
+    if (!name) {
+      toast.error('Informe um nome para a instância');
+      return;
+    }
+    const auto = automacoes.find(a => String(a.id) === String(automacaoId));
+    if (!automacaoId || !auto) {
+      toast.error('Selecione uma automação válida');
+      return;
+    }
+    setInstancias(prev => prev.map(i =>
+      i.Id === selectedInstancia.Id
+        ? {
+            ...i,
+            Name: name,
+            AutomacaoRefId: automacaoId,
+            AutomacaoRefName: name
+          }
+        : i
+    ));
+    toast.success('Instância atualizada (apenas UI)');
+    setShowEditModal(false);
+  };
+
+  const openCreateModal = () => {
+    setCreateForm({ name: '', automacaoId: '' });
+    setShowCreateModal(true);
+  };
+
+  const closeCreateModal = () => setShowCreateModal(false);
+  
+  const handleRestartInstancia = async (instancia) => {
+    const instanceName = (instancia?.Name || '').trim();
+    if (!instanceName) {
+      toast.error('Nome da instância inválido para reiniciar');
+      return;
+    }
+    const res = await Api.restartInstanciaExternal(instanceName);
+    if (!res.success) {
+      toast.error(`Erro ao reiniciar instância: ${res.error}`);
+      return;
+    }
+    toast.success('Instância reiniciada');
+    await fetchInstancias();
+  };
+  
+  const handleSaveCreate = async () => {
+    const name = (createForm.name || '').trim();
+    const automacaoId = createForm.automacaoId;
+    if (!name) {
+      toast.error('Informe um nome para a instância');
+      return;
+    }
+    const auto = automacoes.find(a => String(a.id) === String(automacaoId));
+    if (!automacaoId || !auto) {
+      toast.error('Selecione uma automação válida');
+      return;
+    }
+    // Chamada ao endpoint externo para criar instância
+    const payload = {
+      AutomacaoRefId: automacaoId,
+      AutomacaoRefName: name
+    };
+    const result = await Api.createInstanciaExternal(payload);
+    if (!result.success) {
+      toast.error(`Erro ao criar instância: ${result.error}`);
+      return;
+    }
+    toast.success('Instância criada');
+    setShowCreateModal(false);
+    // Atualiza a lista a partir do backend
+    await fetchInstancias();
   };
 
   return (
@@ -181,6 +267,9 @@ const Instancias = () => {
             <h1>Instâncias WhatsApp</h1>
             <p>Gerencie suas conexões com WhatsApp</p>
           </div>
+          <Button onClick={openCreateModal} className="create-instancia-btn">
+            <i className="fas fa-plus"></i>&nbsp;Nova Instância
+          </Button>
         </div>
         
         <Card className="instancias-filter-card">
@@ -332,14 +421,14 @@ const Instancias = () => {
                         : 'Não conectado'}
                     </span>
                   </div>
-                  
+
                   <div className="info-item">
                     <span className="info-label">Mensagens Enviadas:</span>
                     <span className="info-value">
                       {instancia.mensagensEnviadas?.toLocaleString() || '0'}
                     </span>
                   </div>
-                  
+
                   <div className="info-item">
                     <span className="info-label">Última Atualização:</span>
                     <span className="info-value">
@@ -349,11 +438,86 @@ const Instancias = () => {
                     </span>
                   </div>
 
+                  <div className="info-item" style={{ display: 'flex', gap: '8px' }}>
+                    <Button onClick={() => openEditModal(instancia)}>
+                      <i className="fas fa-edit"></i> Editar
+                    </Button>
+                    <Button variant="secondary" onClick={() => handleRestartInstancia(instancia)}>
+                      <i className="fas fa-sync"></i> Reiniciar
+                    </Button>
+                  </div>
+
                 </div>
               </Card>
             ))}
           </div>
         )}
+        <Modal
+          isOpen={showEditModal}
+          onClose={closeEditModal}
+          title="Editar Instância"
+        >
+          <div className="form-group">
+            <Input
+              label="Nome da Instância"
+              value={editForm.name}
+              onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Digite o novo nome"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <Select
+              label="Automação"
+              value={editForm.automacaoId}
+              onChange={(e) => setEditForm(prev => ({ ...prev, automacaoId: e.target.value }))}
+              placeholder="Selecione uma automação"
+              required
+            >
+              <option value="">Selecione uma automação</option>
+              {automacoes.map((a) => (
+                <option key={a.id} value={a.id}>{a.nome}</option>
+              ))}
+            </Select>
+          </div>
+          <div className="modal-footer">
+            <Button variant="secondary" onClick={closeEditModal}>Cancelar</Button>
+            <Button onClick={handleSaveEdit}>Salvar</Button>
+          </div>
+        </Modal>
+        <Modal
+          isOpen={showCreateModal}
+          onClose={closeCreateModal}
+          title="Nova Instância"
+        >
+          <div className="form-group">
+            <Input
+              label="Nome da Instância"
+              value={createForm.name}
+              onChange={(e) => setCreateForm(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Digite o nome"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <Select
+              label="Automação"
+              value={createForm.automacaoId}
+              onChange={(e) => setCreateForm(prev => ({ ...prev, automacaoId: e.target.value }))}
+              placeholder="Selecione uma automação"
+              required
+            >
+              <option value="">Selecione uma automação</option>
+              {automacoes.map((a) => (
+                <option key={a.id} value={a.id}>{a.nome}</option>
+              ))}
+            </Select>
+          </div>
+          <div className="modal-footer">
+            <Button variant="secondary" onClick={closeCreateModal}>Cancelar</Button>
+            <Button onClick={handleSaveCreate}>Criar</Button>
+          </div>
+        </Modal>
       </div>
     </AuthLayout>
   );

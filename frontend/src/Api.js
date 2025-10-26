@@ -200,6 +200,26 @@ const Api = {
         }
     },
 
+    // Criação de instância via endpoint externo
+    createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName }) => {
+        try {
+            const response = await axios.post(`http://151.242.149.5:3003/create-instance`, { AutomacaoRefId, AutomacaoRefName });
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao criar instância' };
+        }
+    },
+
+    // Reiniciar instância via endpoint externo
+    restartInstanciaExternal: async (instanceName) => {
+        try {
+            const response = await axios.post(`http://151.242.149.5:3002/api/instances`, { instanceName });
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao reiniciar instância' };
+        }
+    },
+
     getAnalyticsLeadsGrowth: async (timeRange) => {
         try {
             const response = await axios.get(`${API_BASE}/analytics/leads-growth?timeRange=${timeRange}`, Environment.HEADERS);
