@@ -203,7 +203,7 @@ const Api = {
     // Criação de instância via endpoint externo
     createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName }) => {
         try {
-            const response = await axios.post(`http://151.242.149.5:3003/create-instance`, { AutomacaoRefId, AutomacaoRefName });
+            const response = await axios.post(`https://b4005b91b946.ngrok-free.app/create-instance`, { AutomacaoRefId, AutomacaoRefName });
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao criar instância' };
@@ -213,7 +213,7 @@ const Api = {
     // Reiniciar instância via endpoint externo
     restartInstanciaExternal: async (instanceName) => {
         try {
-            const response = await axios.post(`http://151.242.149.5:3002/api/instances`, { instanceName });
+            const response = await axios.post(`https://stewart-contributable-lopsidedly.ngrok-free.dev/api/instances`, { instanceName });
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao reiniciar instância' };
