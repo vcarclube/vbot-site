@@ -35,15 +35,20 @@ const Automacoes = () => {
     missaoIA: '',
     dadosColeta: [],
     estrategiaConvencimento: '',
+    estrategiaGeralConversao: '',
     acaoConvencido: '',
     acaoNaoConvencido: '',
     respostasRapidas: [],
     nivelPersonalidade: 'Equilibrado',
     tonConversa: 'Profissional',
+    tomDetalhado: '',
     palavrasEvitar: '',
     limiteTentativas: 3,
     tempoEspera: 60,
-    notificarHumano: true
+    tempoEsperaUnidade: 'segundos',
+    notificarHumano: true,
+    tentativasSugestoes: [],
+    motivosNotificarHumano: []
   });
   
   // Estado para novo dado a ser coletado
@@ -58,6 +63,15 @@ const Automacoes = () => {
     gatilho: '',
     resposta: ''
   });
+
+  // Estado para nova sugestão por tentativa
+  const [novaSugestaoTentativa, setNovaSugestaoTentativa] = useState({
+    tentativa: 1,
+    sugestao: ''
+  });
+
+  // Estado para novo motivo de notificação
+  const [novoMotivo, setNovoMotivo] = useState('');
   
   // Buscar automações
   const fetchAutomacoes = useCallback(async () => {
@@ -132,21 +146,25 @@ const Automacoes = () => {
       nome: '',
       descricao: '',
       campanhaId: '',
-      instanciaId: '',
       status: 'Ativo',
       detalheProduto: '',
       missaoIA: '',
       dadosColeta: [],
       estrategiaConvencimento: '',
+      estrategiaGeralConversao: '',
       acaoConvencido: '',
       acaoNaoConvencido: '',
       respostasRapidas: [],
       nivelPersonalidade: 'Equilibrado',
       tonConversa: 'Profissional',
+      tomDetalhado: '',
       palavrasEvitar: '',
       limiteTentativas: 3,
       tempoEspera: 60,
-      notificarHumano: true
+      tempoEsperaUnidade: 'segundos',
+      notificarHumano: true,
+      tentativasSugestoes: [],
+      motivosNotificarHumano: []
     });
     setModalMode('create');
     setCurrentStep(1);
@@ -158,7 +176,11 @@ const Automacoes = () => {
     setFormData({
       ...automacao,
       campanhaId: automacao.campanhaId || '',
-      instanciaId: automacao.instanciaId || ''
+      estrategiaGeralConversao: automacao.estrategiaGeralConversao || '',
+      tomDetalhado: automacao.tomDetalhado || '',
+      tempoEsperaUnidade: automacao.tempoEsperaUnidade || 'segundos',
+      tentativasSugestoes: automacao.tentativasSugestoes || [],
+      motivosNotificarHumano: automacao.motivosNotificarHumano || []
     });
     setModalMode('edit');
     setCurrentStep(1);
@@ -207,15 +229,26 @@ const Automacoes = () => {
   // Salvar automação (criar ou editar)
   const handleSaveAutomacao = async () => {
     try {
+      // Converter tempo de espera para segundos com base na unidade
+      const unitMap = {
+        segundos: 1,
+        minutos: 60,
+        horas: 3600,
+        dias: 86400,
+        semanas: 604800,
+        meses: 2592000
+      };
+      const tempoEsperaSegundos = Number(formData.tempoEspera || 0) * (unitMap[formData.tempoEsperaUnidade || 'segundos'] || 1);
+      const payload = { ...formData, tempoEspera: tempoEsperaSegundos };
       let response;
       
       if (modalMode === 'create') {
-        response = await Api.createAutomacao(formData);
+        response = await Api.createAutomacao(payload);
         if (response.success) {
           toast.success('Automação criada com sucesso');
         }
       } else {
-        response = await Api.updateAutomacao(formData.id, formData);
+        response = await Api.updateAutomacao(formData.id, payload);
         if (response.success) {
           toast.success('Automação atualizada com sucesso');
         }
@@ -292,6 +325,54 @@ const Automacoes = () => {
     setFormData(prev => ({
       ...prev,
       respostasRapidas: prev.respostasRapidas.filter(resposta => resposta.id !== id)
+    }));
+  };
+
+  // Adicionar sugestão por tentativa
+  const handleAddSugestaoTentativa = () => {
+    const tentativaNum = Number(novaSugestaoTentativa.tentativa || 0);
+    const sugestaoTxt = (novaSugestaoTentativa.sugestao || '').trim();
+    if (!tentativaNum || !sugestaoTxt) {
+      toast.warning('Informe a tentativa e a sugestão');
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      tentativasSugestoes: [
+        ...prev.tentativasSugestoes,
+        { id: Date.now(), tentativa: tentativaNum, sugestao: sugestaoTxt }
+      ]
+    }));
+    setNovaSugestaoTentativa({ tentativa: 1, sugestao: '' });
+  };
+
+  // Remover sugestão por tentativa
+  const handleRemoveSugestaoTentativa = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      tentativasSugestoes: prev.tentativasSugestoes.filter(item => item.id !== id)
+    }));
+  };
+
+  // Adicionar motivo de notificação
+  const handleAddMotivoNotificar = () => {
+    const motivo = (novoMotivo || '').trim();
+    if (!motivo) {
+      toast.warning('Informe um motivo');
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      motivosNotificarHumano: [...prev.motivosNotificarHumano, { id: Date.now(), texto: motivo }]
+    }));
+    setNovoMotivo('');
+  };
+
+  // Remover motivo de notificação
+  const handleRemoveMotivoNotificar = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      motivosNotificarHumano: prev.motivosNotificarHumano.filter(m => m.id !== id)
     }));
   };
   
@@ -506,6 +587,18 @@ const Automacoes = () => {
             <p className="modal-subtitle">Defina como a IA deve agir em diferentes cenários</p>
             
             <div className="form-group">
+              <label className="form-label">Estratégia geral de conversão</label>
+              <textarea
+                name="estrategiaGeralConversao"
+                value={formData.estrategiaGeralConversao}
+                onChange={handleFormChange}
+                className="form-textarea"
+                placeholder="Guideline geral que a IA deve seguir para conduzir o lead rumo à conversão. Ex: Começar com empatia, reforçar benefícios, tratar objeções e orientar para ação clara."
+                rows={4}
+              ></textarea>
+            </div>
+            
+            <div className="form-group">
               <label className="form-label">Estratégia para Leads Indecisos</label>
               <textarea
                 name="estrategiaConvencimento"
@@ -670,6 +763,19 @@ const Automacoes = () => {
                 <option value="Persuasivo">Persuasivo</option>
               </Select>
             </div>
+
+            <div className="form-group">
+              <label className="form-label">Tom da Conversa (detalhado)</label>
+              <textarea
+                name="tomDetalhado"
+                value={formData.tomDetalhado}
+                onChange={handleFormChange}
+                className="form-textarea"
+                placeholder="Ex: Amigável, empático, direto, objetivo, proativo e com um toque de informalidade que humanize o atendimento. A ideia é ser acessível, confiável e um verdadeiro consultor para o cliente."
+                rows={3}
+              ></textarea>
+              <small className="form-text">Descreva o tom desejado em detalhes.</small>
+            </div>
             
             <div className="form-group">
               <label className="form-label">Palavras ou Frases a Evitar</label>
@@ -701,7 +807,7 @@ const Automacoes = () => {
               </div>
               
               <div className="form-group">
-                <label className="form-label">Tempo de Espera (segundos)</label>
+                <label className="form-label">Tempo de Espera</label>
                 <input
                   type="number"
                   name="tempoEspera"
@@ -711,10 +817,69 @@ const Automacoes = () => {
                   max="300"
                   className="form-control"
                 />
+                <div style={{ marginTop: '8px' }}>
+                  <Select
+                    name="tempoEsperaUnidade"
+                    value={formData.tempoEsperaUnidade}
+                    onChange={handleFormChange}
+                    placeholder="Unidade"
+                  >
+                    <option value="segundos">Segundos</option>
+                    <option value="minutos">Minutos</option>
+                    <option value="horas">Horas</option>
+                    <option value="dias">Dias</option>
+                    <option value="semanas">Semanas</option>
+                    <option value="meses">Meses</option>
+                  </Select>
+                </div>
                 <small className="form-text">
                   Tempo de espera antes de enviar outra mensagem
                 </small>
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Sugestões de comportamento por interação</label>
+              <div className="form-row">
+                <div className="form-group" style={{ maxWidth: '160px' }}>
+                  <label className="form-label">Tentativa</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    className="form-control"
+                    value={novaSugestaoTentativa.tentativa}
+                    onChange={(e) => setNovaSugestaoTentativa({ ...novaSugestaoTentativa, tentativa: e.target.value })}
+                  />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="form-label">Sugestão</label>
+                  <textarea
+                    className="form-textarea"
+                    rows={2}
+                    placeholder="Descreva o comportamento sugerido para esta tentativa"
+                    value={novaSugestaoTentativa.sugestao}
+                    onChange={(e) => setNovaSugestaoTentativa({ ...novaSugestaoTentativa, sugestao: e.target.value })}
+                  ></textarea>
+                </div>
+              </div>
+              <Button onClick={handleAddSugestaoTentativa} style={{ marginTop: '8px' }}>
+                Adicionar Sugestão
+              </Button>
+              {!!formData.tentativasSugestoes?.length && (
+                <div style={{ marginTop: '12px' }}>
+                  {formData.tentativasSugestoes.map(item => (
+                    <div key={item.id} className="list-item">
+                      <div className="list-content">
+                        <strong>Tentativa {item.tentativa}:</strong> {item.sugestao}
+                      </div>
+                      <button className="list-remove" onClick={() => handleRemoveSugestaoTentativa(item.id)}>
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div className="form-group switch-group">
@@ -728,6 +893,34 @@ const Automacoes = () => {
                 checked={formData.notificarHumano}
                 onChange={(checked) => setFormData({...formData, notificarHumano: checked})}
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Motivos para notificar um atendente humano</label>
+              <div className="form-row">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Ex: Usuário pediu para falar com humano, dados sensíveis ou erro recorrente"
+                    value={novoMotivo}
+                    onChange={(e) => setNovoMotivo(e.target.value)}
+                  />
+                </div>
+                <Button onClick={handleAddMotivoNotificar}>Adicionar Motivo</Button>
+              </div>
+              {!!formData.motivosNotificarHumano?.length && (
+                <div style={{ marginTop: '12px' }}>
+                  {formData.motivosNotificarHumano.map(m => (
+                    <div key={m.id} className="list-item">
+                      <div className="list-content">{m.texto}</div>
+                      <button className="list-remove" onClick={() => handleRemoveMotivoNotificar(m.id)}>
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </>
         );
@@ -964,7 +1157,7 @@ const Automacoes = () => {
               </div>
             </div>
             
-            <div className="modal-content">
+            <div className="modal-content" style={{height: 'none !important', marginTop: '0px !important'}}>
               {renderModalContent()}
             </div>
             

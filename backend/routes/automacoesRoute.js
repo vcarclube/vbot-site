@@ -19,7 +19,9 @@ router.get('/', validateToken, async (req, res) => {
     const automacoes = result.recordsets[0].map(automacao => ({
       ...automacao,
       dadosColeta: JSON.parse(automacao.dadosColeta || '[]'),
-      respostasRapidas: JSON.parse(automacao.respostasRapidas || '[]')
+      respostasRapidas: JSON.parse(automacao.respostasRapidas || '[]'),
+      tentativasSugestoes: JSON.parse(automacao.tentativasSugestoes || '[]'),
+      motivosNotificarHumano: JSON.parse(automacao.motivosNotificarHumano || '[]')
     }));
     
     res.json(automacoes);
@@ -50,7 +52,9 @@ router.get('/:id', validateToken, async (req, res) => {
     const automacao = {
         ...result.recordset[0],
         dadosColeta: JSON.parse(result.recordset[0].dadosColeta || '[]'),
-        respostasRapidas: JSON.parse(result.recordset[0].respostasRapidas || '[]')
+        respostasRapidas: JSON.parse(result.recordset[0].respostasRapidas || '[]'),
+        tentativasSugestoes: JSON.parse(result.recordset[0].tentativasSugestoes || '[]'),
+        motivosNotificarHumano: JSON.parse(result.recordset[0].motivosNotificarHumano || '[]')
       };
       
       res.json(automacao);
@@ -72,14 +76,19 @@ router.post('/', validateToken, async (req, res) => {
         missaoIA,
         dadosColeta,
         estrategiaConvencimento,
+        estrategiaGeralConversao,
         acaoConvencido,
         acaoNaoConvencido,
         respostasRapidas,
+        tentativasSugestoes,
+        motivosNotificarHumano,
         nivelPersonalidade,
         tonConversa,
+        tomDetalhado,
         palavrasEvitar,
         limiteTentativas,
         tempoEspera,
+        tempoEsperaUnidade,
         notificarHumano
       } = req.body;
       
@@ -112,17 +121,19 @@ router.post('/', validateToken, async (req, res) => {
         INSERT INTO Automacoes (
           id, nome, descricao, campanhaId, status, 
           detalheProduto, missaoIA, dadosColeta, estrategiaConvencimento, 
-          acaoConvencido, acaoNaoConvencido, respostasRapidas, 
-          nivelPersonalidade, tonConversa, palavrasEvitar, 
-          limiteTentativas, tempoEspera, notificarHumano, 
+          estrategiaGeralConversao, acaoConvencido, acaoNaoConvencido, respostasRapidas, 
+          tentativasSugestoes, motivosNotificarHumano, 
+          nivelPersonalidade, tonConversa, tomDetalhado, palavrasEvitar, 
+          limiteTentativas, tempoEspera, tempoEsperaUnidade, notificarHumano, 
           dataCriacao, idUser
         )
         VALUES (
           @id, @nome, @descricao, @campanhaId, @status, 
           @detalheProduto, @missaoIA, @dadosColeta, @estrategiaConvencimento, 
-          @acaoConvencido, @acaoNaoConvencido, @respostasRapidas, 
-          @nivelPersonalidade, @tonConversa, @palavrasEvitar, 
-          @limiteTentativas, @tempoEspera, @notificarHumano, 
+          @estrategiaGeralConversao, @acaoConvencido, @acaoNaoConvencido, @respostasRapidas, 
+          @tentativasSugestoes, @motivosNotificarHumano, 
+          @nivelPersonalidade, @tonConversa, @tomDetalhado, @palavrasEvitar, 
+          @limiteTentativas, @tempoEspera, @tempoEsperaUnidade, @notificarHumano, 
           @dataCriacao, @idUser
         )
       `;
@@ -137,14 +148,19 @@ router.post('/', validateToken, async (req, res) => {
         missaoIA: missaoIA || '',
         dadosColeta: JSON.stringify(dadosColeta || []),
         estrategiaConvencimento: estrategiaConvencimento || '',
+        estrategiaGeralConversao: estrategiaGeralConversao || '',
         acaoConvencido: acaoConvencido || '',
         acaoNaoConvencido: acaoNaoConvencido || '',
         respostasRapidas: JSON.stringify(respostasRapidas || []),
+        tentativasSugestoes: JSON.stringify(tentativasSugestoes || []),
+        motivosNotificarHumano: JSON.stringify(motivosNotificarHumano || []),
         nivelPersonalidade: nivelPersonalidade || 'Equilibrado',
         tonConversa: tonConversa || 'Profissional',
+        tomDetalhado: tomDetalhado || '',
         palavrasEvitar: palavrasEvitar || '',
         limiteTentativas: limiteTentativas || 3,
         tempoEspera: tempoEspera || 60,
+        tempoEsperaUnidade: tempoEsperaUnidade || 'segundos',
         notificarHumano: notificarHumano === undefined ? true : notificarHumano,
         dataCriacao,
         idUser: req.user.id
@@ -172,16 +188,23 @@ router.post('/', validateToken, async (req, res) => {
         missaoIA,
         dadosColeta,
         estrategiaConvencimento,
+        estrategiaGeralConversao,
         acaoConvencido,
         acaoNaoConvencido,
         respostasRapidas,
+        tentativasSugestoes,
+        motivosNotificarHumano,
         nivelPersonalidade,
         tonConversa,
+        tomDetalhado,
         palavrasEvitar,
         limiteTentativas,
         tempoEspera,
+        tempoEsperaUnidade,
         notificarHumano
       } = req.body;
+
+      console.log(req.body)
       
       // Validações básicas
       if (!nome || !campanhaId) {
@@ -227,7 +250,7 @@ router.post('/', validateToken, async (req, res) => {
       
       const updateQuery = `
         UPDATE Automacoes
-        SET
+        SET 
           nome = @nome,
           descricao = @descricao,
           campanhaId = @campanhaId,
@@ -236,14 +259,19 @@ router.post('/', validateToken, async (req, res) => {
           missaoIA = @missaoIA,
           dadosColeta = @dadosColeta,
           estrategiaConvencimento = @estrategiaConvencimento,
+          estrategiaGeralConversao = @estrategiaGeralConversao,
           acaoConvencido = @acaoConvencido,
           acaoNaoConvencido = @acaoNaoConvencido,
           respostasRapidas = @respostasRapidas,
+          tentativasSugestoes = @tentativasSugestoes,
+          motivosNotificarHumano = @motivosNotificarHumano,
           nivelPersonalidade = @nivelPersonalidade,
           tonConversa = @tonConversa,
+          tomDetalhado = @tomDetalhado,
           palavrasEvitar = @palavrasEvitar,
           limiteTentativas = @limiteTentativas,
           tempoEspera = @tempoEspera,
+          tempoEsperaUnidade = @tempoEsperaUnidade,
           notificarHumano = @notificarHumano,
           dataAtualizacao = @dataAtualizacao
         WHERE id = @id AND idUser = @idUser
@@ -259,14 +287,19 @@ router.post('/', validateToken, async (req, res) => {
         missaoIA: missaoIA || '',
         dadosColeta: JSON.stringify(dadosColeta || []),
         estrategiaConvencimento: estrategiaConvencimento || '',
+        estrategiaGeralConversao: estrategiaGeralConversao || '',
         acaoConvencido: acaoConvencido || '',
         acaoNaoConvencido: acaoNaoConvencido || '',
         respostasRapidas: JSON.stringify(respostasRapidas || []),
+        tentativasSugestoes: JSON.stringify(tentativasSugestoes || []),
+        motivosNotificarHumano: JSON.stringify(motivosNotificarHumano || []),
         nivelPersonalidade: nivelPersonalidade || 'Equilibrado',
         tonConversa: tonConversa || 'Profissional',
+        tomDetalhado: tomDetalhado || '',
         palavrasEvitar: palavrasEvitar || '',
         limiteTentativas: limiteTentativas || 3,
         tempoEspera: tempoEspera || 60,
+        tempoEsperaUnidade: tempoEsperaUnidade || 'segundos',
         notificarHumano: notificarHumano === undefined ? true : notificarHumano,
         dataAtualizacao: new Date().toISOString(),
         idUser: req.user.id
