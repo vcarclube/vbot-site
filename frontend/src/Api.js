@@ -200,6 +200,15 @@ const Api = {
         }
     },
 
+    updateInstancia: async (id, { name, automacaoId }) => {
+        try {
+            const response = await axios.put(`${API_BASE}/instancias/${id}`, { name, automacaoId }, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao atualizar instância' };
+        }
+    },
+
     // Criação de instância via endpoint externo 3003
     createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName }) => {
         try {

@@ -195,18 +195,19 @@ const Instancias = () => {
       toast.error('Selecione uma automação válida');
       return;
     }
-    setInstancias(prev => prev.map(i =>
-      i.Id === selectedInstancia.Id
-        ? {
-            ...i,
-            Name: name,
-            AutomacaoRefId: automacaoId,
-            AutomacaoRefName: name
-          }
-        : i
-    ));
-    toast.success('Instância atualizada (apenas UI)');
-    setShowEditModal(false);
+    Api.updateInstancia(selectedInstancia.Id, { name, automacaoId })
+      .then(async (res) => {
+        if (!res.success) {
+          toast.error(res.error || 'Erro ao atualizar instância');
+          return;
+        }
+        toast.success('Instância atualizada com sucesso');
+        setShowEditModal(false);
+        await fetchInstancias();
+      })
+      .catch(() => {
+        toast.error('Erro ao atualizar instância');
+      });
   };
 
   const openCreateModal = () => {
