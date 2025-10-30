@@ -200,20 +200,20 @@ const Api = {
         }
     },
 
-    // Criação de instância via endpoint externo
+    // Criação de instância via endpoint externo 3003
     createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName }) => {
         try {
-            const response = await axios.post(`https://b4005b91b946.ngrok-free.app/create-instance`, { AutomacaoRefId, AutomacaoRefName });
+            const response = await axios.post(`https://6e97d0e7de8d.ngrok-free.app/create-instance`, { AutomacaoRefId, AutomacaoRefName });
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao criar instância' };
         }
     },
 
-    // Reiniciar instância via endpoint externo
+    // Reiniciar instância via endpoint externo 3002
     restartInstanciaExternal: async (instanceName) => {
         try {
-            const response = await axios.post(`https://stewart-contributable-lopsidedly.ngrok-free.dev/api/instances`, { instanceName });
+            const response = await axios.post(`https://cc3b38acddb4.ngrok-free.app/api/instances`, { instanceName });
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao reiniciar instância' };
