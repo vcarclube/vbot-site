@@ -203,7 +203,7 @@ const Api = {
     // Criação de instância via endpoint externo 3003
     createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName }) => {
         try {
-            const response = await axios.post(`https://10e358412429.ngrok-free.app/create-instance`, { AutomacaoRefId, AutomacaoRefName });
+            const response = await axios.post(`https://api.vcarclube.com.br/v1/create-instance`, { AutomacaoRefId, AutomacaoRefName });
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao criar instância' };
@@ -213,7 +213,7 @@ const Api = {
     // Reiniciar instância via endpoint externo 3002
     restartInstanciaExternal: async (instanceName) => {
         try {
-            const response = await axios.post(`https://cc3b38acddb4.ngrok-free.app /api/instances`, { instanceName });
+            const response = await axios.post(`https://api.vcarclube.com.br/v1/api/instances`, { instanceName });
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao reiniciar instância' };
