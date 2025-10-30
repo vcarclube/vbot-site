@@ -203,7 +203,7 @@ const Api = {
     // Criação de instância via endpoint externo 3003
     createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName }) => {
         try {
-            const response = await axios.post(`https://api.vcarclube.com.br/v1/create-instance`, { AutomacaoRefId, AutomacaoRefName });
+            const response = await axios.post(`https://api.vcarclube.com.br/v2/create-instance`, { AutomacaoRefId, AutomacaoRefName });
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao criar instância' };
