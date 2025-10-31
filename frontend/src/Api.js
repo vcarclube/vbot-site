@@ -293,6 +293,15 @@ const Api = {
         }
     },
 
+    duplicateAutomacao: async (id) => {
+        try {
+            const response = await axios.post(`${API_BASE}/automacoes/${id}/duplicate`, {}, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao duplicar automação' };
+        }
+    },
+
     deleteAutomacao: async (id) => {
         try {
             const response = await axios.delete(`${API_BASE}/automacoes/${id}`, Environment.HEADERS);

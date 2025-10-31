@@ -204,7 +204,7 @@ const Automacoes = () => {
       }
     }
   };
-  
+
   // Alternar status da automação
   const handleToggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === 'Ativo' ? 'Inativo' : 'Ativo';
@@ -223,6 +223,22 @@ const Automacoes = () => {
     } catch (error) {
       console.error('Erro ao atualizar status da automação:', error);
       toast.error('Erro ao atualizar status da automação');
+    }
+  };
+
+  // Duplicar automação
+  const handleDuplicateAutomacao = async (id) => {
+    try {
+      const response = await Api.duplicateAutomacao(id);
+      if (response.success) {
+        toast.success('Automação duplicada com sucesso');
+        fetchAutomacoes();
+      } else {
+        toast.error(response.error || 'Erro ao duplicar automação');
+      }
+    } catch (error) {
+      console.error('Erro ao duplicar automação:', error);
+      toast.error('Erro ao duplicar automação');
     }
   };
   
@@ -1094,6 +1110,15 @@ const Automacoes = () => {
                     onClick={() => handleEditAutomacao(automacao)}
                   >
                     <i className="fas fa-edit"></i>
+                  </button>
+
+                  <button 
+                    className="action-btn duplicate-btn" 
+                    style={{background: 'gray'}}
+                    title="Duplicar"
+                    onClick={() => handleDuplicateAutomacao(automacao.id)}
+                  >
+                    <i className="fas fa-copy"></i>
                   </button>
                   
                   <button 

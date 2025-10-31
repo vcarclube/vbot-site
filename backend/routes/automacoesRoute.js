@@ -401,5 +401,88 @@ router.get('/:id', validateToken, async (req, res) => {
       res.status(500).json({ message: 'Erro ao excluir automação', error: error.message });
     }
   });
+
+  // Duplicar uma automação
+  router.post('/:id/duplicate', validateToken, async (req, res) => {
+    try {
+      // Buscar automação original
+      const getQuery = `
+        SELECT * FROM Automacoes
+        WHERE id = @id AND idUser = @idUser
+      `;
+      const getResult = await db.query(getQuery, {
+        id: req.params.id,
+        idUser: req.user.id
+      });
+      if (!getResult.recordset || getResult.recordset.length === 0) {
+        return res.status(404).json({ message: 'Automação não encontrada para duplicação' });
+      }
+      const original = getResult.recordset[0];
+
+      // Preparar novos valores
+      const newId = uuidv4();
+      const now = new Date().toISOString();
+      const newName = `${original.nome || 'Automação'} - Cópia`;
+      const newStatus = 'Inativo';
+
+      const insertQuery = `
+        INSERT INTO Automacoes (
+          id, nome, descricao, campanhaId, status,
+          detalheProduto, missaoIA, dadosColeta, estrategiaConvencimento,
+          estrategiaGeralConversao, acaoConvencido, acaoNaoConvencido, respostasRapidas,
+          tentativasSugestoes, motivosNotificarHumano,
+          nivelPersonalidade, tonConversa, tomDetalhado, palavrasEvitar,
+          limiteTentativas, tempoEspera, tempoEsperaUnidade, notificarHumano,
+          dataCriacao, idUser
+        ) VALUES (
+          @id, @nome, @descricao, @campanhaId, @status,
+          @detalheProduto, @missaoIA, @dadosColeta, @estrategiaConvencimento,
+          @estrategiaGeralConversao, @acaoConvencido, @acaoNaoConvencido, @respostasRapidas,
+          @tentativasSugestoes, @motivosNotificarHumano,
+          @nivelPersonalidade, @tonConversa, @tomDetalhado, @palavrasEvitar,
+          @limiteTentativas, @tempoEspera, @tempoEsperaUnidade, @notificarHumano,
+          @dataCriacao, @idUser
+        )
+      `;
+
+      // Limitar campos numéricos para evitar overflow
+      const MAX_INT = 2147483647;
+      const safeLimiteTentativas = Math.max(0, Math.min(parseInt(original.limiteTentativas ?? 3, 10), MAX_INT));
+      const safeTempoEspera = Math.max(0, Math.min(parseInt(original.tempoEspera ?? 60, 10), MAX_INT));
+
+      await db.query(insertQuery, {
+        id: newId,
+        nome: newName,
+        descricao: original.descricao || '',
+        campanhaId: original.campanhaId, // mantém campanha; pode ser ajustado depois no UI
+        status: newStatus,
+        detalheProduto: original.detalheProduto || '',
+        missaoIA: original.missaoIA || '',
+        dadosColeta: original.dadosColeta || '[]',
+        estrategiaConvencimento: original.estrategiaConvencimento || '',
+        estrategiaGeralConversao: original.estrategiaGeralConversao || '',
+        acaoConvencido: original.acaoConvencido || '',
+        acaoNaoConvencido: original.acaoNaoConvencido || '',
+        respostasRapidas: original.respostasRapidas || '[]',
+        tentativasSugestoes: original.tentativasSugestoes || '[]',
+        motivosNotificarHumano: original.motivosNotificarHumano || '[]',
+        nivelPersonalidade: original.nivelPersonalidade || 'Equilibrado',
+        tonConversa: original.tonConversa || 'Profissional',
+        tomDetalhado: original.tomDetalhado || '',
+        palavrasEvitar: original.palavrasEvitar || '',
+        limiteTentativas: safeLimiteTentativas,
+        tempoEspera: safeTempoEspera,
+        tempoEsperaUnidade: original.tempoEsperaUnidade || 'segundos',
+        notificarHumano: original.notificarHumano === undefined ? true : !!original.notificarHumano,
+        dataCriacao: now,
+        idUser: req.user.id
+      });
+
+      return res.status(201).json({ message: 'Automação duplicada com sucesso', id: newId });
+    } catch (error) {
+      console.error('Erro ao duplicar automação:', error);
+      res.status(500).json({ message: 'Erro ao duplicar automação', error: error.message });
+    }
+  });
   
   module.exports = router;
