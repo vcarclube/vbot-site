@@ -88,8 +88,7 @@ router.put('/:id', validateToken, async (req, res) => {
 
     const updateQuery = `
       UPDATE WhatsAppInstances
-      SET Name = @name,
-          AutomacaoRefId = @automacaoId,
+      SET AutomacaoRefId = @automacaoId,
           AutomacaoRefName = @name
       WHERE Id = @id AND idUser = @idUser
     `;
