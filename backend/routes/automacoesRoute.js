@@ -65,7 +65,7 @@ router.get('/:id', validateToken, async (req, res) => {
   });
   
   // Criar uma nova automação
-router.post('/', validateToken, async (req, res) => {
+  router.post('/', validateToken, async (req, res) => {
     try {
       const {
         nome,
@@ -116,6 +116,12 @@ router.post('/', validateToken, async (req, res) => {
       
       const id = uuidv4();
       const dataCriacao = new Date().toISOString();
+      // Sanitização e coerção de tipos numéricos para evitar overflow/conversões indevidas
+      const safeLimiteTentativas = Math.max(0, parseInt(limiteTentativas ?? 3, 10));
+      // MSSQL INT: máximo 2.147.483.647
+      const MAX_INT = 2147483647;
+      const safeTempoEspera = Math.max(0, Math.min(parseInt(tempoEspera ?? 60, 10), MAX_INT));
+      const safeNotificarHumano = notificarHumano === undefined ? true : !!notificarHumano;
       
       const query = `
         INSERT INTO Automacoes (
@@ -158,10 +164,10 @@ router.post('/', validateToken, async (req, res) => {
         tonConversa: tonConversa || 'Profissional',
         tomDetalhado: tomDetalhado || '',
         palavrasEvitar: palavrasEvitar || '',
-        limiteTentativas: limiteTentativas || 3,
-        tempoEspera: tempoEspera || 60,
+        limiteTentativas: safeLimiteTentativas,
+        tempoEspera: safeTempoEspera,
         tempoEsperaUnidade: tempoEsperaUnidade || 'segundos',
-        notificarHumano: notificarHumano === undefined ? true : notificarHumano,
+        notificarHumano: safeNotificarHumano,
         dataCriacao,
         idUser: req.user.id
       });
@@ -248,6 +254,12 @@ router.post('/', validateToken, async (req, res) => {
         }
       }
       
+      // Sanitização e coerção de tipos numéricos para evitar overflow/conversões indevidas
+      const safeLimiteTentativas = Math.max(0, parseInt(limiteTentativas ?? 3, 10));
+      const MAX_INT = 2147483647;
+      const safeTempoEspera = Math.max(0, Math.min(parseInt(tempoEspera ?? 60, 10), MAX_INT));
+      const safeNotificarHumano = notificarHumano === undefined ? true : !!notificarHumano;
+
       const updateQuery = `
         UPDATE Automacoes
         SET 
@@ -297,10 +309,10 @@ router.post('/', validateToken, async (req, res) => {
         tonConversa: tonConversa || 'Profissional',
         tomDetalhado: tomDetalhado || '',
         palavrasEvitar: palavrasEvitar || '',
-        limiteTentativas: limiteTentativas || 3,
-        tempoEspera: tempoEspera || 60,
+        limiteTentativas: safeLimiteTentativas,
+        tempoEspera: safeTempoEspera,
         tempoEsperaUnidade: tempoEsperaUnidade || 'segundos',
-        notificarHumano: notificarHumano === undefined ? true : notificarHumano,
+        notificarHumano: safeNotificarHumano,
         dataAtualizacao: new Date().toISOString(),
         idUser: req.user.id
       });
