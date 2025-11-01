@@ -36,3 +36,87 @@
 .pagination{
     overflow-x: auto;
 }
+
+/* Estilos para o botão Ver Dados */
+.lead-action-btn.view-dados {
+    color: #17a2b8;
+    background: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.lead-action-btn.view-dados:hover{
+    background: #17a2b8;
+    color: white;
+}
+
+/* Estilos para o modal de dados coletados */
+.dados-coletados-content {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.lead-info-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.lead-info-header h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.lead-contact {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.dados-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dado-item {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    transition: box-shadow 0.2s ease;
+}
+
+.dado-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dado-key {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.dado-value {
+    color: #333;
+    font-size: 1rem;
+    word-wrap: break-word;
+}
+
+.no-dados {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.no-dados i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.no-dados p {
+    margin: 0;
+    font-size: 1rem;
+}

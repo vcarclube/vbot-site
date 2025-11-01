@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import './style.css';
 
 const Modal = ({ isOpen, onClose, title, children, size = 'medium' }) => {
@@ -17,7 +18,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'medium' }) => {
 
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal-overlay">
       <div 
         className={`modal-container modal-${size}`} 
@@ -34,7 +35,8 @@ const Modal = ({ isOpen, onClose, title, children, size = 'medium' }) => {
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

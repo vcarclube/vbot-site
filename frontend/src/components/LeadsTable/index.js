@@ -2,11 +2,14 @@ import ReactPaginate from 'react-paginate';
 import React, { useState, useEffect } from 'react';
 import './style.css'; // Certifique-se de criar um arquivo CSS para incluir suas classes
 import Utils from '../../Utils';
+import Modal from '../Modal';
 
 const LeadsTable = ({filteredLeads, handleEditLead, handleDeleteLead}) => {
 
     const [pageCount, setPageCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
+    const [dadosModalOpen, setDadosModalOpen] = useState(false);
+    const [selectedLeadDados, setSelectedLeadDados] = useState(null);
     const leadsPerPage = 10; // Define quantos leads mostrar por página
 
     useEffect(() => {
@@ -16,6 +19,30 @@ const LeadsTable = ({filteredLeads, handleEditLead, handleDeleteLead}) => {
 
     const handlePageClick = (data) => {
         setCurrentPage(data.selected);
+    };
+
+    // Abrir modal de dados coletados
+    const handleViewDados = (lead) => {
+        setSelectedLeadDados(lead);
+        setDadosModalOpen(true);
+    };
+
+    // Fechar modal de dados
+    const handleCloseDadosModal = () => {
+        setDadosModalOpen(false);
+        setSelectedLeadDados(null);
+    };
+
+    // Parse dos dados JSON do lead
+    const parseDados = (dadosString) => {
+        if (!dadosString) return [];
+        
+        try {
+            return JSON.parse(dadosString);
+        } catch (error) {
+            console.error('Erro ao fazer parse dos dados:', error);
+            return [];
+        }
     };
 
     // Formatar data para exibição
@@ -60,6 +87,9 @@ const LeadsTable = ({filteredLeads, handleEditLead, handleDeleteLead}) => {
                                 <td>{lead.EtapaFunil ? <span className="lead-stage">{lead.EtapaFunil}</span> : '-'}</td>
                                 <td>{formatDate(lead.DataCadastro)}</td>
                                 <td className="lead-actions">
+                                    <button className="lead-action-btn view-dados" onClick={() => handleViewDados(lead)} title="Ver Dados Coletados">
+                                        <i className="fas fa-eye"></i>
+                                    </button>
                                     <button className="lead-action-btn edit" onClick={() => handleEditLead(lead)} title="Editar">
                                         <i className="fas fa-edit"></i>
                                     </button>
@@ -87,6 +117,43 @@ const LeadsTable = ({filteredLeads, handleEditLead, handleDeleteLead}) => {
                 nextClassName={'page-item'}
                 pageClassName={'page-item'}
             />
+
+            {/* Modal de Dados Coletados */}
+            <Modal
+                isOpen={dadosModalOpen}
+                onClose={handleCloseDadosModal}
+                title="Dados Coletados"
+                size="medium"
+            >
+                <div className="dados-coletados-content">
+                    {selectedLeadDados && (
+                        <>
+                            <br/>
+                            <div className="lead-info-header">
+                                <h4>{selectedLeadDados.Nome || 'Lead sem nome'}</h4>
+                                <p className="lead-contact">{selectedLeadDados.Email || selectedLeadDados.Celular || 'Sem contato'}</p>
+                            </div>
+                            
+                            <div className="dados-list">
+                                {parseDados(selectedLeadDados.Dados).length > 0 ? (
+                                    parseDados(selectedLeadDados.Dados).map((item, index) => (
+                                        <div key={index} className="dado-item">
+                                            <div className="dado-key">{item.key}</div>
+                                            <div className="dado-value">{item.value}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="no-dados">
+                                        <i className="fas fa-info-circle"></i>
+                                        <p>Nenhum dado coletado encontrado para este lead.</p>
+                                    </div>
+                                )}
+                            </div>
+                            <br/>
+                        </>
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 };
