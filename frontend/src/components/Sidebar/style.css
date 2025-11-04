@@ -79,9 +79,73 @@
     margin: 0;
   }
   
-  .sidebar-menu-item {
+.sidebar-menu-item {
     position: relative;
     margin-bottom: 2px;
+  }
+
+  /* ===== SUBMENU (DESKTOP) ===== */
+  .has-submenu > .sidebar-menu-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .submenu-caret {
+    margin-left: auto;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+  }
+
+  .sidebar-submenu {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 8px 0;
+    margin-left: 28px; /* indent under parent */
+    padding-left: 12px; /* visual gutter */
+    border-left: 2px solid var(--gray-200);
+    display: none;
+  }
+
+  .sidebar-submenu.open {
+    display: block;
+  }
+
+  .submenu-item {
+    margin: 2px 0;
+  }
+
+  .submenu-link {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    color: var(--gray-700);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.95rem;
+  }
+
+  .submenu-link:hover {
+    background-color: var(--primary-bg);
+    color: var(--primary);
+  }
+
+  .submenu-item.active .submenu-link {
+    background-color: transparent;
+    color: var(--primary);
+    font-weight: 500;
+  }
+
+  .submenu-icon {
+    font-size: 0.95rem;
+    width: 18px;
+    text-align: center;
+    margin-right: 8px;
+  }
+
+  .sidebar.closed .sidebar-submenu {
+    display: none;
   }
   
   .sidebar-menu-link {
@@ -518,4 +582,48 @@
     .mobile-drawer {
       display: flex;
     }
+  }
+
+  /* ===== SUBMENU (MOBILE DRAWER) ===== */
+  .mobile-submenu {
+    list-style: none;
+    padding-left: 28px; /* indent under parent */
+    border-left: 2px solid var(--gray-200);
+    display: none;
+    margin: 4px 0 8px 0;
+  }
+  .mobile-submenu.open {
+    display: block;
+  }
+  .mobile-submenu-item {
+    margin: 4px 0;
+  }
+  .mobile-submenu-link {
+    display: flex;
+    align-items: center;
+    color: var(--gray-700);
+    text-decoration: none;
+    padding: 6px 0;
+    font-size: 0.95rem;
+  }
+  .mobile-submenu-item.active .mobile-submenu-link {
+    color: var(--primary);
+    font-weight: 500;
+  }
+  .mobile-submenu-icon {
+    width: 18px;
+    text-align: center;
+    margin-right: 8px;
+  }
+  /* Normalize button appearance used for submenu toggle */
+  button.sidebar-menu-link {
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+  }
+  button.sidebar-menu-link:focus {
+    outline: none;
   }

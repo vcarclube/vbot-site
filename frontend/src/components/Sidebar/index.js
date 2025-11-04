@@ -124,6 +124,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
+  // Controle de dropdowns para Conversas
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const toggleDropdown = (id) => {
+    setOpenDropdown(prev => (prev === id ? null : id));
+  };
+  const closeDropdown = () => setOpenDropdown(null);
+  const isConversationsSectionActive = ['conversations', 'attendants', 'support'].includes(activeItem);
+
   return (
     <>
       {/* Sidebar para desktop */}
@@ -140,15 +148,55 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="sidebar-content">
           <nav className="sidebar-nav">
             <ul className="sidebar-menu">
-              {allMenuItems.map((item) => (
-                <li key={item.id} className={`sidebar-menu-item ${activeItem === item.id ? 'active' : ''}`}>
-                  <Link to={item.path} className="sidebar-menu-link" onClick={handleItemClick}>
-                    <i className={`sidebar-menu-icon ${item.icon}`}></i>
-                    {isOpen && <span className="sidebar-menu-text">{item.label}</span>}
-                    {!isOpen && <span className="sidebar-tooltip">{item.label}</span>}
-                  </Link>
-                </li>
-              ))}
+              {allMenuItems.map((item) => {
+                if (item.id === 'conversations') {
+                  return (
+                    <li key={item.id} className={`sidebar-menu-item has-submenu ${isConversationsSectionActive ? 'active' : ''}`}>
+                      <button type="button" className="sidebar-menu-link" onClick={() => toggleDropdown('conversations')}>
+                        <i className={`sidebar-menu-icon ${item.icon}`}></i>
+                        {isOpen && <span className="sidebar-menu-text">{item.label}</span>}
+                        {!isOpen && <span className="sidebar-tooltip">{item.label}</span>}
+                        {isOpen && (
+                          <i className={`submenu-caret fas ${openDropdown === 'conversations' ? 'fa-chevron-down' : 'fa-chevron-right'}`}></i>
+                        )}
+                      </button>
+
+                      {isOpen && (
+                        <ul className={`sidebar-submenu ${openDropdown === 'conversations' ? 'open' : ''}`}>
+                          <li className={`submenu-item ${activeItem === 'conversations' ? 'active' : ''}`}>
+                            <Link to="/conversations" className="submenu-link" onClick={() => { handleItemClick(); closeDropdown(); }}>
+                              <i className="submenu-icon fas fa-robot"></i>
+                              <span className="submenu-text">Atendentes IA</span>
+                            </Link>
+                          </li>
+                          <li className={`submenu-item ${activeItem === 'attendants' ? 'active' : ''}`}>
+                            <Link to="/attendants" className="submenu-link" onClick={() => { handleItemClick(); closeDropdown(); }}>
+                              <i className="submenu-icon fas fa-user-tie"></i>
+                              <span className="submenu-text">Atendentes</span>
+                            </Link>
+                          </li>
+                          <li className={`submenu-item ${activeItem === 'support' ? 'active' : ''}`}>
+                            <Link to="/support" className="submenu-link" onClick={() => { handleItemClick(); closeDropdown(); }}>
+                              <i className="submenu-icon fas fa-life-ring"></i>
+                              <span className="submenu-text">Suporte</span>
+                            </Link>
+                          </li>
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
+
+                return (
+                  <li key={item.id} className={`sidebar-menu-item ${activeItem === item.id ? 'active' : ''}`}>
+                    <Link to={item.path} className="sidebar-menu-link" onClick={handleItemClick}>
+                      <i className={`sidebar-menu-icon ${item.icon}`}></i>
+                      {isOpen && <span className="sidebar-menu-text">{item.label}</span>}
+                      {!isOpen && <span className="sidebar-tooltip">{item.label}</span>}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>
@@ -221,14 +269,48 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="mobile-drawer-content">
           <nav className="mobile-drawer-nav">
             <ul className="mobile-drawer-menu">
-              {drawerItems.map((item) => (
-                <li key={item.id} className={`mobile-drawer-item ${activeItem === item.id ? 'active' : ''}`}>
-                  <Link to={item.path} className="mobile-drawer-link" onClick={handleItemClick}>
-                    <i className={`mobile-drawer-icon ${item.icon}`}></i>
-                    <span className="mobile-drawer-text">{item.label}</span>
-                  </Link>
-                </li>
-              ))}
+              {drawerItems.map((item) => {
+                if (item.id === 'conversations') {
+                  return (
+                    <li key={item.id} className={`mobile-drawer-item has-submenu ${isConversationsSectionActive ? 'active' : ''}`}>
+                      <button type="button" className="mobile-drawer-link" onClick={() => toggleDropdown('conversations')}>
+                        <i className={`mobile-drawer-icon ${item.icon}`}></i>
+                        <span className="mobile-drawer-text">{item.label}</span>
+                        <i className={`submenu-caret fas ${openDropdown === 'conversations' ? 'fa-chevron-down' : 'fa-chevron-right'}`}></i>
+                      </button>
+
+                      <ul className={`mobile-submenu ${openDropdown === 'conversations' ? 'open' : ''}`}>
+                        <li className={`mobile-submenu-item ${activeItem === 'conversations' ? 'active' : ''}`}>
+                          <Link to="/conversations" className="mobile-submenu-link" onClick={() => { handleItemClick(); closeDropdown(); }}>
+                            <i className="mobile-submenu-icon fas fa-robot"></i>
+                            <span className="mobile-submenu-text">Automação</span>
+                          </Link>
+                        </li>
+                        <li className={`mobile-submenu-item ${activeItem === 'attendants' ? 'active' : ''}`}>
+                          <Link to="/attendants" className="mobile-submenu-link" onClick={() => { handleItemClick(); closeDropdown(); }}>
+                            <i className="mobile-submenu-icon fas fa-user-tie"></i>
+                            <span className="mobile-submenu-text">Atendentes</span>
+                          </Link>
+                        </li>
+                        <li className={`mobile-submenu-item ${activeItem === 'support' ? 'active' : ''}`}>
+                          <Link to="/support" className="mobile-submenu-link" onClick={() => { handleItemClick(); closeDropdown(); }}>
+                            <i className="mobile-submenu-icon fas fa-life-ring"></i>
+                            <span className="mobile-submenu-text">Suporte</span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={item.id} className={`mobile-drawer-item ${activeItem === item.id ? 'active' : ''}`}>
+                    <Link to={item.path} className="mobile-drawer-link" onClick={handleItemClick}>
+                      <i className={`mobile-drawer-icon ${item.icon}`}></i>
+                      <span className="mobile-drawer-text">{item.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>
