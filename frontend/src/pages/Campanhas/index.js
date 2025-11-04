@@ -133,8 +133,8 @@ const Campanhas = () => {
             mensagens: [''],
             dataInicio: getTomorrowDate(),
             horaInicio: '08:00',
-            dataFim: getNextWeekDate(),
-            horaFim: '18:00',
+            dataFim: '',
+            horaFim: '',
             status: 'Ativo'
         });
         setModalOpen(true);
@@ -275,21 +275,22 @@ const Campanhas = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.nome || formData.grupos.length === 0 || !formData.mensagens[0]) {
-            toast.error('Preencha todos os campos obrigatórios');
+        if (!formData.nome || !formData.dataInicio || !formData.horaInicio) {
+            toast.error('Preencha ao menos nome e início da campanha');
             return;
         }
 
         // Validar datas
         const dataInicioCompleta = `${formData.dataInicio}T${formData.horaInicio}:00`;
-        const dataFimCompleta = `${formData.dataFim}T${formData.horaFim}:00`;
+        const dataFimCompleta = (formData.dataFim && formData.horaFim) ? `${formData.dataFim}T${formData.horaFim}:00` : null;
 
         const dataInicio = new Date(dataInicioCompleta);
-        const dataFim = new Date(dataFimCompleta);
-
-        if (dataInicio >= dataFim) {
-            toast.error('A data de início deve ser anterior à data de fim');
-            return;
+        if (dataFimCompleta) {
+            const dataFim = new Date(dataFimCompleta);
+            if (dataInicio >= dataFim) {
+                toast.error('A data de início deve ser anterior à data de fim');
+                return;
+            }
         }
 
         // Preparar dados para envio
@@ -298,7 +299,7 @@ const Campanhas = () => {
             Groups: formData.grupos,
             Messages: formData.mensagens.filter(msg => msg.trim() !== ''),
             StartDate: dataInicioCompleta,
-            EndDate: dataFimCompleta,
+            EndDate: dataFimCompleta || undefined,
             Status: formData.status
         };
 
@@ -541,22 +542,22 @@ const Campanhas = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Grupos de Leads *</label>
+                            <label>Grupos de Leads (opcional)</label>
                             <select
                                 multiple
                                 name="grupos"
                                 value={formData.grupos}
                                 onChange={handleGruposChange}
                                 className="multi-select"
-                                required
                             >
+                                <option value="sem-grupo">Sem Grupo</option>
                                 {gruposLeads?.map((grupo, index) => (
                                     <option key={index} value={grupo.NomeGrupo}>
                                         {grupo.NomeGrupo}
                                     </option>
                                 ))}
                             </select>
-                            <small className="form-text">Segure Ctrl para selecionar múltiplos grupos</small>
+                            <small className="form-text">Opcional. Deixe vazio para não filtrar por grupo. Selecione "Sem Grupo" para direcionar apenas leads sem grupo. Segure Ctrl para selecionar múltiplos.</small>
                         </div>
                     </div>
 
@@ -583,7 +584,7 @@ const Campanhas = () => {
                                     onChange={(e) => handleMensagemChange(index, e.target.value)}
                                     placeholder="Digite a mensagem de saudação..."
                                     className="mensagem-textarea"
-                                    required={index === 0}
+                                    required={false}
                                 ></textarea>
 
                                 <div className="mensagem-variables">
@@ -614,9 +615,7 @@ const Campanhas = () => {
                         >
                             <i className="fas fa-plus"></i> Adicionar Mensagem
                         </Button>
-                        <small className="form-text">
-                            Múltiplas mensagens serão enviadas aleatoriamente para cada lead.
-                        </small>
+                        <small className="form-text">Opcional. Se você disparar mensagens, pode cadastrar saudações aqui. Múltiplas mensagens serão enviadas aleatoriamente para cada lead.</small>
                     </div>
 
                     <div className="form-section">
@@ -649,28 +648,27 @@ const Campanhas = () => {
 
                         <div className="form-row">
                             <div className="form-group">
-                                <label>Data de Término *</label>
+                                <label>Data de Término (opcional)</label>
                                 <Input
                                     type="date"
                                     name="dataFim"
                                     value={formData.dataFim}
                                     onChange={handleFormChange}
                                     min={formData.dataInicio}
-                                    required
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label>Hora de Término *</label>
+                                <label>Hora de Término (opcional)</label>
                                 <Input
                                     type="time"
                                     name="horaFim"
                                     value={formData.horaFim}
                                     onChange={handleFormChange}
-                                    required
                                 />
                             </div>
                         </div>
+                        <small className="form-text">Opcional. Se não definir término, a campanha permanece ativa até ser pausada ou finalizada.</small>
                     </div>
 
                     <div className="form-section">

@@ -71,9 +71,9 @@ router.post('/', validateToken, async (req, res) => {
             Status
         } = req.body;
 
-        // Validação básica
-        if (!Name || !Groups || !Groups.length || !Messages || !Messages.length || !StartDate || !Status) {
-            return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos' });
+        // Validação básica (tornar Groups, Messages e EndDate opcionais)
+        if (!Name || !StartDate || !Status) {
+            return res.status(400).json({ message: 'Campos obrigatórios ausentes: Name, StartDate e Status' });
         }
 
         // Validar datas
@@ -106,7 +106,7 @@ router.post('/', validateToken, async (req, res) => {
             endDate: fim,
             status: Status,
             createdAt: now,
-            Groups: Groups.join("|"),
+            Groups: (Array.isArray(Groups) && Groups.length > 0) ? Groups.join("|") : null,
             idUser: req.user.id
         };
 
@@ -126,55 +126,58 @@ router.post('/', validateToken, async (req, res) => {
             await db.query(bulkInsertQuery);
         }
 
-        // Buscar leads em ImportedLeads cujos grupos estão em 'Groups'
-        const groupsPlaceholders = Groups.map((_, idx) => `@group${idx}`).join(", ");
-        const importedLeadsQuery = `
-            SELECT Nome, Celular 
-            FROM ImportedLeads 
-            WHERE NomeGrupo IN (${groupsPlaceholders})
-        `;
+        // Inserção de leads baseada em grupos (opcional)
+        if (Array.isArray(Groups) && Groups.length > 0) {
+            const includeNoGroup = Groups.includes('sem-grupo');
+            const actualGroups = Groups.filter(g => g !== 'sem-grupo');
 
-        const importedLeadsParams = {};
-        Groups.forEach((group, idx) => {
-            importedLeadsParams[`group${idx}`] = group;
-        });
+            let importedLeadsQuery = `SELECT Nome, Celular FROM ImportedLeads WHERE idUser = @idUser`;
+            const importedLeadsParams = { idUser: req.user.id };
 
-        const importedLeadsResult = await db.query(importedLeadsQuery, importedLeadsParams);
-        const importedLeads = importedLeadsResult.recordset;
+            if (actualGroups.length > 0) {
+                const placeholders = actualGroups.map((_, idx) => `@group${idx}`).join(', ');
+                importedLeadsQuery += ` AND NomeGrupo IN (${placeholders})`;
+                actualGroups.forEach((group, idx) => {
+                    importedLeadsParams[`group${idx}`] = group;
+                });
+            }
+            if (includeNoGroup) {
+                importedLeadsQuery += ` ${actualGroups.length > 0 ? 'OR' : 'AND'} (NomeGrupo IS NULL OR NomeGrupo = '')`;
+            }
 
-        // Inserir leads na tabela Leads
-        if (importedLeads.length > 0) {
-            const leadValues = importedLeads.map(lead =>
-                `('${uuidv4()}', '${campaignId}', '${lead.Nome.replace(/'/g, "''")}', '${lead.Celular?.replace("(","")?.replace(")", "")?.replace("-", "")?.replace(" ", "")}', 'Pendente', null)`
-            ).join(", ");
+            const importedLeadsResult = await db.query(importedLeadsQuery, importedLeadsParams);
+            const importedLeads = importedLeadsResult.recordset;
 
-            const insertLeadsQuery = `
-                INSERT INTO Leads (Id, CampaignId, Name, PhoneNumber, Status, SentDate) 
-                VALUES ${leadValues}
-            `;
+            if (importedLeads.length > 0) {
+                const leadValues = importedLeads.map(lead =>
+                    `('${uuidv4()}', '${campaignId}', '${lead.Nome.replace(/'/g, "''")}', '${lead.Celular?.replace("(","")?.replace(")", "")?.replace("-", "")?.replace(" ", "")}', 'Pendente', null)`
+                ).join(', ');
 
-            await db.query(insertLeadsQuery);
+                const insertLeadsQuery = `
+                    INSERT INTO Leads (Id, CampaignId, Name, PhoneNumber, Status, SentDate) 
+                    VALUES ${leadValues}
+                `;
+
+                await db.query(insertLeadsQuery);
+            }
+
+            // Atualiza ImportedLeads para prospecção nos grupos selecionados
+            let updateImportedLeadsQuery = `UPDATE ImportedLeads SET EtapaFunil = @EtapaFunil WHERE idUser = @idUser`;
+            const paramsLeads = { EtapaFunil: 'Prospecção', idUser: req.user.id };
+
+            if (actualGroups.length > 0) {
+                const placeholders = actualGroups.map((_, idx) => `@group${idx}`).join(', ');
+                updateImportedLeadsQuery += ` AND NomeGrupo IN (${placeholders})`;
+                actualGroups.forEach((group, idx) => {
+                    paramsLeads[`group${idx}`] = group;
+                });
+            }
+            if (includeNoGroup) {
+                updateImportedLeadsQuery += ` ${actualGroups.length > 0 ? 'OR' : 'AND'} (NomeGrupo IS NULL OR NomeGrupo = '')`;
+            }
+
+            await db.query(updateImportedLeadsQuery, paramsLeads);
         }
-
-        //Atualiza leads para prospecção
-        const groupParams = Groups.map((_, index) => `@group${index}`).join(', ');
-
-        const updateImportedLeadsQuery = `
-            UPDATE ImportedLeads
-            SET EtapaFunil = @EtapaFunil
-            WHERE NomeGrupo IN (${groupParams}) AND idUser = @idUser
-        `;
-
-        const paramsLeads = {
-            EtapaFunil: "Prospecção",
-            idUser: req.user.id
-        };
-
-        Groups.forEach((group, index) => {
-            paramsLeads[`group${index}`] = group;
-        });
-
-        await db.query(updateImportedLeadsQuery, paramsLeads);
 
         return res.status(201).json({
             success: true,
@@ -203,9 +206,9 @@ router.put('/:id', validateToken, async (req, res) => {
             Status
         } = req.body;
 
-        // Validação básica
-        if (!Name || !Groups || !Groups.length || !Messages || !Messages.length || !StartDate || !Status) {
-            return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos' });
+        // Validação básica (tornar Groups, Messages e EndDate opcionais)
+        if (!Name || !StartDate || !Status) {
+            return res.status(400).json({ message: 'Campos obrigatórios ausentes: Name, StartDate e Status' });
         }
 
         // Validar datas
@@ -250,7 +253,7 @@ router.put('/:id', validateToken, async (req, res) => {
             startDate: inicio,
             endDate: fim,
             status: Status,
-            Groups: Groups.join("|"),
+            Groups: (Array.isArray(Groups) && Groups.length > 0) ? Groups.join("|") : null,
             idUser: req.user.id
         };
 
@@ -278,35 +281,40 @@ router.put('/:id', validateToken, async (req, res) => {
         const deleteLeadsQuery = `DELETE FROM Leads WHERE CampaignId = @CampaignId`;
         await db.query(deleteLeadsQuery, { CampaignId: campaignId });
 
-        // Buscar leads em ImportedLeads cujos grupos estão em 'Groups'
-        const groupsPlaceholders = Groups.map((_, idx) => `@group${idx}`).join(", ");
-        const importedLeadsQuery = `
-            SELECT Nome, Celular 
-            FROM ImportedLeads 
-            WHERE NomeGrupo IN (${groupsPlaceholders})
-        `;
+        // Inserir novamente leads conforme grupos (se fornecidos)
+        if (Array.isArray(Groups) && Groups.length > 0) {
+            const includeNoGroup = Groups.includes('sem-grupo');
+            const actualGroups = Groups.filter(g => g !== 'sem-grupo');
 
-        const importedLeadsParams = {};
-        Groups.forEach((group, idx) => {
-            importedLeadsParams[`group${idx}`] = group;
-        });
+            let importedLeadsQuery = `SELECT Nome, Celular FROM ImportedLeads WHERE idUser = @idUser`;
+            const importedLeadsParams = { idUser: req.user.id };
 
-        const importedLeadsResult = await db.query(importedLeadsQuery, importedLeadsParams);
-        const importedLeads = importedLeadsResult.recordset;
+            if (actualGroups.length > 0) {
+                const placeholders = actualGroups.map((_, idx) => `@group${idx}`).join(', ');
+                importedLeadsQuery += ` AND NomeGrupo IN (${placeholders})`;
+                actualGroups.forEach((group, idx) => {
+                    importedLeadsParams[`group${idx}`] = group;
+                });
+            }
+            if (includeNoGroup) {
+                importedLeadsQuery += ` ${actualGroups.length > 0 ? 'OR' : 'AND'} (NomeGrupo IS NULL OR NomeGrupo = '')`;
+            }
 
-        // Inserir leads na tabela Leads
-        const now = new Date();
-        if (importedLeads.length > 0) {
-            const leadValues = importedLeads.map(lead =>
-                `('${uuidv4()}', '${campaignId}', '${lead.Nome.replace(/'/g, "''")}', '${lead.Celular}', 'Pendente', null)`
-            ).join(", ");
+            const importedLeadsResult = await db.query(importedLeadsQuery, importedLeadsParams);
+            const importedLeads = importedLeadsResult.recordset;
 
-            const insertLeadsQuery = `
-                INSERT INTO Leads (Id, CampaignId, Name, PhoneNumber, Status, SentDate) 
-                VALUES ${leadValues}
-            `;
+            if (importedLeads.length > 0) {
+                const leadValues = importedLeads.map(lead =>
+                    `('${uuidv4()}', '${campaignId}', '${lead.Nome.replace(/'/g, "''")}', '${lead.Celular}', 'Pendente', null)`
+                ).join(', ');
 
-            await db.query(insertLeadsQuery);
+                const insertLeadsQuery = `
+                    INSERT INTO Leads (Id, CampaignId, Name, PhoneNumber, Status, SentDate) 
+                    VALUES ${leadValues}
+                `;
+
+                await db.query(insertLeadsQuery);
+            }
         }
 
         // Resposta final
