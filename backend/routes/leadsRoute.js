@@ -207,7 +207,8 @@ router.post('/save', validateToken, async (req, res) => {
       bairro,
       nomeGrupo,
       etapaFunil,
-      tags
+      tags,
+      operadora
     } = req.body;
 
     // Validação básica
@@ -223,10 +224,10 @@ router.post('/save', validateToken, async (req, res) => {
     const query = `
         INSERT INTO ImportedLeads (
           id, nome, email, celular, cpf, nascimento, genero, idade,
-          estado, cidade, bairro, nomeGrupo, etapaFunil, tags, dataCadastro, idUser
+          estado, cidade, bairro, nomeGrupo, etapaFunil, tags, Operadora, dataCadastro, idUser
         ) VALUES (
           @id, @nome, @email, @celular, @cpf, @nascimento, @genero, @idade,
-          @estado, @cidade, @bairro, @nomeGrupo, @etapaFunil, @tags, @dataCadastro, @idUser
+          @estado, @cidade, @bairro, @nomeGrupo, @etapaFunil, @tags, @operadora, @dataCadastro, @idUser
         );
         SELECT SCOPE_IDENTITY() AS id;
       `;
@@ -246,6 +247,7 @@ router.post('/save', validateToken, async (req, res) => {
       nomeGrupo,
       etapaFunil,
       tags,
+      operadora,
       dataCadastro: now,
       idUser: idUser || null
     };
@@ -275,7 +277,8 @@ router.put('/:id', validateToken, async (req, res) => {
       bairro,
       nomeGrupo,
       etapaFunil,
-      tags
+      tags,
+      operadora
     } = req.body;
 
     // Validação básica
@@ -304,7 +307,8 @@ router.put('/:id', validateToken, async (req, res) => {
           bairro = @bairro, 
           nomeGrupo = @nomeGrupo, 
           etapaFunil = @etapaFunil, 
-          tags = @tags
+          tags = @tags,
+          Operadora = @operadora
         WHERE id = @id
       `;
 
@@ -322,6 +326,7 @@ router.put('/:id', validateToken, async (req, res) => {
       nomeGrupo,
       etapaFunil,
       tags,
+      operadora,
       id: req.params.id
     };
 

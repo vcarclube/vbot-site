@@ -120,3 +120,21 @@
     margin: 0;
     font-size: 1rem;
 }
+
+/* Ícone de operadora ao lado do celular */
+.phone-with-carrier {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+}
+
+.carrier-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    border-radius: 3px;
+}
+
+.phone-text {
+    display: inline-block;
+}

@@ -56,6 +56,16 @@ const LeadsTable = ({filteredLeads, handleEditLead, handleDeleteLead}) => {
         }
     };
 
+    const getCarrierIconSrc = (carrierName) => {
+        if (!carrierName) return null;
+        const up = String(carrierName).toUpperCase();
+        if (up.includes('CLARO')) return `../claro.png`;
+        if (up.includes('VIVO') || up.includes('TELEFONICA')) return `../vivo.png`;
+        if (up.includes('TIM')) return `../tim.png`;
+        if (up.includes('OI')) return `../oi.png`;
+        return null;
+    };
+
     const displayLeads = filteredLeads.slice(currentPage * leadsPerPage, (currentPage + 1) * leadsPerPage);
 
     return (
@@ -80,7 +90,18 @@ const LeadsTable = ({filteredLeads, handleEditLead, handleDeleteLead}) => {
                             <tr key={lead.id}>
                                 <td className="lead-name">{lead.Nome || '-'}</td>
                                 <td>{lead.Email || '-'}</td>
-                                <td>{Utils.formatToCelular(lead.Celular) || '-'}</td>
+                                <td className="">
+                                    {(() => {
+                                        const phone = Utils.formatToCelular(lead.Celular) || '-';
+                                        const icon = getCarrierIconSrc(lead.Operadora);
+                                        return (
+                                            <div className="phone-with-carrier">
+                                                <span className="phone-text">{phone}</span>
+                                                {icon && <img src={icon} alt={lead.Operadora} className="carrier-icon" />}
+                                            </div>
+                                        );
+                                    })()}
+                                </td>
                                 <td>{lead.NomeGrupo ? <span className="lead-group">{lead.NomeGrupo}</span> : '-'}</td>
                                 <td>{lead.Estado || '-'}</td>
                                 <td>{lead.Cidade || '-'}</td>

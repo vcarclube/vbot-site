@@ -65,7 +65,8 @@ const Leads = () => {
         bairro: '',
         nomeGrupo: '',
         etapaFunil: '',
-        tags: ''
+        tags: '',
+        operadora: ''
     });
 
     const [grupoNome, setGrupoNome] = useState("");
@@ -79,6 +80,45 @@ const Leads = () => {
     useEffect(() => {
         filterLeads();
     }, [leads, filters, searchTerm]);
+
+    // Buscar operadora com base no celular informado (debounced)
+    useEffect(() => {
+        const sanitizePhone = (raw) => {
+            if (!raw) return '';
+            const digits = String(raw).replace(/\D/g, '');
+            // Preferir número local brasileiro (10-11 dígitos). Remove prefixo 55 se presente
+            const withoutCountry = digits.startsWith('55') ? digits.slice(2) : digits;
+            // Garantir máximo 11 dígitos
+            return withoutCountry.slice(-11);
+        };
+
+        const number = sanitizePhone(formData.celular);
+        if (!number || number.length < 10) {
+            // Limpa operadora se número ainda não é válido
+            setFormData(prev => ({ ...prev, operadora: '' }));
+            return;
+        }
+
+        const controller = new AbortController();
+        const timer = setTimeout(async () => {
+            try {
+                const url = `https://apilayer.net/api/validate?access_key=4265d8dfd13a942965f3888dd1c707d3&number=${number}&country_code=br&format=1`;
+                const resp = await fetch(url, { signal: controller.signal });
+                const data = await resp.json();
+                const carrier = data?.carrier || '';
+                setFormData(prev => ({ ...prev, operadora: carrier }));
+            } catch (err) {
+                // Silencia erros e não altera o fluxo
+                // console.error('Erro ao buscar operadora:', err);
+            }
+        }, 600);
+
+        return () => {
+            controller.abort();
+            clearTimeout(timer);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [formData.celular]);
 
     // Buscar leads da API
     const fetchLeads = async () => {
@@ -201,7 +241,8 @@ const Leads = () => {
             bairro: '',
             nomeGrupo: '',
             etapaFunil: '',
-            tags: ''
+            tags: '',
+            operadora: ''
         });
         setModalOpen(true);
     };
@@ -223,7 +264,8 @@ const Leads = () => {
             bairro: lead.Bairro || '',
             nomeGrupo: lead.NomeGrupo || '',
             etapaFunil: lead.EtapaFunil || '',
-            tags: lead.Tags || ''
+            tags: lead.Tags || '',
+            operadora: lead.Operadora || ''
         });
         setModalOpen(true);
     };
@@ -796,6 +838,20 @@ const Leads = () => {
                                 name="cpf"
                                 value={formData.cpf}
                                 onChange={handleFormChange}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <Input
+                                label="Operadora"
+                                type="text"
+                                name="operadora"
+                                value={formData.operadora}
+                                onChange={handleFormChange}
+                                placeholder="Detectada automaticamente pelo celular"
+                                readOnly
                             />
                         </div>
                     </div>
