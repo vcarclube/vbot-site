@@ -87,7 +87,7 @@ const Leads = () => {
             let url = `${Environment.API_BASE}/leads/all`;
             const params = new URLSearchParams();
 
-            if (filters.NomeGrupo) {
+            if (filters.NomeGrupo && filters.NomeGrupo !== 'sem-grupo') {
                 params.append('property_id', filters.NomeGrupo);
             }
 
@@ -140,7 +140,11 @@ const Leads = () => {
         }
 
         if (filters.NomeGrupo) {
-            result = result.filter(lead => lead.NomeGrupo && lead.NomeGrupo === filters.NomeGrupo);
+            if (filters.NomeGrupo === 'sem-grupo') {
+                result = result.filter(lead => !lead.NomeGrupo);
+            } else {
+                result = result.filter(lead => lead.NomeGrupo && lead.NomeGrupo === filters.NomeGrupo);
+            }
         }
 
         if (filters.EtapaFunil) {
@@ -685,6 +689,7 @@ const Leads = () => {
                                     placeholder="Grupo"
                                 >
                                     <option value="">Todos os grupos</option>
+                                    <option value="sem-grupo">Sem Grupo</option>
                                     {filterOptions.grupos?.map(grupo => (
                                         <option key={grupo} value={grupo}>{grupo}</option>
                                     ))}
