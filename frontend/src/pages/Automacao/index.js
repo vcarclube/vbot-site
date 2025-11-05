@@ -39,6 +39,7 @@ const Automacoes = () => {
     acaoConvencido: '',
     acaoNaoConvencido: '',
     respostasRapidas: [],
+    saudacoes: [],
     nivelPersonalidade: 'Equilibrado',
     tonConversa: 'Profissional',
     tomDetalhado: '',
@@ -63,6 +64,36 @@ const Automacoes = () => {
     gatilho: '',
     resposta: ''
   });
+
+  // Estado e handlers para saudações
+  const [novaSaudacao, setNovaSaudacao] = useState({ mensagem: '' });
+
+  const handleAddSaudacao = () => {
+    const mensagem = (novaSaudacao.mensagem || '').trim();
+    if (!mensagem) {
+      toast.warning('Informe uma mensagem de saudação');
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      saudacoes: [...(prev.saudacoes || []), { id: Date.now(), mensagem }]
+    }));
+    setNovaSaudacao({ mensagem: '' });
+  };
+
+  const handleRemoveSaudacao = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      saudacoes: (prev.saudacoes || []).filter(s => s.id !== id)
+    }));
+  };
+
+  const handleChangeSaudacao = (id, mensagem) => {
+    setFormData(prev => ({
+      ...prev,
+      saudacoes: (prev.saudacoes || []).map(s => s.id === id ? { ...s, mensagem } : s)
+    }));
+  };
 
   // Estado para nova sugestão por tentativa
   const [novaSugestaoTentativa, setNovaSugestaoTentativa] = useState({
@@ -155,6 +186,7 @@ const Automacoes = () => {
       acaoConvencido: '',
       acaoNaoConvencido: '',
       respostasRapidas: [],
+      saudacoes: [],
       nivelPersonalidade: 'Equilibrado',
       tonConversa: 'Profissional',
       tomDetalhado: '',
@@ -180,7 +212,8 @@ const Automacoes = () => {
       tomDetalhado: automacao.tomDetalhado || '',
       tempoEsperaUnidade: automacao.tempoEsperaUnidade || 'segundos',
       tentativasSugestoes: automacao.tentativasSugestoes || [],
-      motivosNotificarHumano: automacao.motivosNotificarHumano || []
+      motivosNotificarHumano: automacao.motivosNotificarHumano || [],
+      saudacoes: automacao.saudacoes || []
     });
     setModalMode('edit');
     setCurrentStep(1);
@@ -517,6 +550,41 @@ const Automacoes = () => {
               <small className="form-text">
                 Ex: Qualificar leads interessados em energia solar, agendar demonstrações, coletar informações para orçamento.
               </small>
+            </div>
+
+            <div className="form-group saudacoes-section">
+              <label className="form-label">Mensagens de Saudações</label>
+              <div className="saudacoes-add">
+                <textarea
+                  className="saudacao-textarea"
+                  name="novaSaudacao"
+                  value={novaSaudacao.mensagem}
+                  onChange={(e) => setNovaSaudacao({ mensagem: e.target.value })}
+                  placeholder="Ex.: Olá! Como posso ajudar?"
+                  rows={2}
+                ></textarea>
+                <Button className="saudacoes-add-btn" onClick={handleAddSaudacao}>Adicionar Saudação</Button>
+              </div>
+              {(formData.saudacoes || []).length > 0 ? (
+                <div className="saudacoes-list">
+                  {(formData.saudacoes || []).map((s) => (
+                    <div key={s.id} className="saudacao-item">
+                      <textarea
+                        className="saudacao-textarea"
+                        value={s.mensagem}
+                        onChange={(e) => handleChangeSaudacao(s.id, e.target.value)}
+                        placeholder="Mensagem de saudação"
+                        rows={2}
+                      ></textarea>
+                      <button className="saudacao-remove-btn" title="Remover" onClick={() => handleRemoveSaudacao(s.id)}>
+                        <i className="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <small className="form-text">Nenhuma saudação adicionada ainda.</small>
+              )}
             </div>
           </>
         );

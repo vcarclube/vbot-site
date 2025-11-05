@@ -21,7 +21,8 @@ router.get('/', validateToken, async (req, res) => {
       dadosColeta: JSON.parse(automacao.dadosColeta || '[]'),
       respostasRapidas: JSON.parse(automacao.respostasRapidas || '[]'),
       tentativasSugestoes: JSON.parse(automacao.tentativasSugestoes || '[]'),
-      motivosNotificarHumano: JSON.parse(automacao.motivosNotificarHumano || '[]')
+      motivosNotificarHumano: JSON.parse(automacao.motivosNotificarHumano || '[]'),
+      saudacoes: JSON.parse(automacao.saudacoes || '[]')
     }));
     
     res.json(automacoes);
@@ -54,7 +55,8 @@ router.get('/:id', validateToken, async (req, res) => {
         dadosColeta: JSON.parse(result.recordset[0].dadosColeta || '[]'),
         respostasRapidas: JSON.parse(result.recordset[0].respostasRapidas || '[]'),
         tentativasSugestoes: JSON.parse(result.recordset[0].tentativasSugestoes || '[]'),
-        motivosNotificarHumano: JSON.parse(result.recordset[0].motivosNotificarHumano || '[]')
+        motivosNotificarHumano: JSON.parse(result.recordset[0].motivosNotificarHumano || '[]'),
+        saudacoes: JSON.parse(result.recordset[0].saudacoes || '[]')
       };
       
       res.json(automacao);
@@ -80,6 +82,7 @@ router.get('/:id', validateToken, async (req, res) => {
         acaoConvencido,
         acaoNaoConvencido,
         respostasRapidas,
+        saudacoes,
         tentativasSugestoes,
         motivosNotificarHumano,
         nivelPersonalidade,
@@ -127,7 +130,7 @@ router.get('/:id', validateToken, async (req, res) => {
         INSERT INTO Automacoes (
           id, nome, descricao, campanhaId, status, 
           detalheProduto, missaoIA, dadosColeta, estrategiaConvencimento, 
-          estrategiaGeralConversao, acaoConvencido, acaoNaoConvencido, respostasRapidas, 
+          estrategiaGeralConversao, acaoConvencido, acaoNaoConvencido, respostasRapidas, saudacoes,
           tentativasSugestoes, motivosNotificarHumano, 
           nivelPersonalidade, tonConversa, tomDetalhado, palavrasEvitar, 
           limiteTentativas, tempoEspera, tempoEsperaUnidade, notificarHumano, 
@@ -136,7 +139,7 @@ router.get('/:id', validateToken, async (req, res) => {
         VALUES (
           @id, @nome, @descricao, @campanhaId, @status, 
           @detalheProduto, @missaoIA, @dadosColeta, @estrategiaConvencimento, 
-          @estrategiaGeralConversao, @acaoConvencido, @acaoNaoConvencido, @respostasRapidas, 
+          @estrategiaGeralConversao, @acaoConvencido, @acaoNaoConvencido, @respostasRapidas, @saudacoes,
           @tentativasSugestoes, @motivosNotificarHumano, 
           @nivelPersonalidade, @tonConversa, @tomDetalhado, @palavrasEvitar, 
           @limiteTentativas, @tempoEspera, @tempoEsperaUnidade, @notificarHumano, 
@@ -158,6 +161,7 @@ router.get('/:id', validateToken, async (req, res) => {
         acaoConvencido: acaoConvencido || '',
         acaoNaoConvencido: acaoNaoConvencido || '',
         respostasRapidas: JSON.stringify(respostasRapidas || []),
+        saudacoes: JSON.stringify(saudacoes || []),
         tentativasSugestoes: JSON.stringify(tentativasSugestoes || []),
         motivosNotificarHumano: JSON.stringify(motivosNotificarHumano || []),
         nivelPersonalidade: nivelPersonalidade || 'Equilibrado',
@@ -198,6 +202,7 @@ router.get('/:id', validateToken, async (req, res) => {
         acaoConvencido,
         acaoNaoConvencido,
         respostasRapidas,
+        saudacoes,
         tentativasSugestoes,
         motivosNotificarHumano,
         nivelPersonalidade,
@@ -275,6 +280,7 @@ router.get('/:id', validateToken, async (req, res) => {
           acaoConvencido = @acaoConvencido,
           acaoNaoConvencido = @acaoNaoConvencido,
           respostasRapidas = @respostasRapidas,
+          saudacoes = @saudacoes,
           tentativasSugestoes = @tentativasSugestoes,
           motivosNotificarHumano = @motivosNotificarHumano,
           nivelPersonalidade = @nivelPersonalidade,
@@ -303,6 +309,7 @@ router.get('/:id', validateToken, async (req, res) => {
         acaoConvencido: acaoConvencido || '',
         acaoNaoConvencido: acaoNaoConvencido || '',
         respostasRapidas: JSON.stringify(respostasRapidas || []),
+        saudacoes: JSON.stringify(saudacoes || []),
         tentativasSugestoes: JSON.stringify(tentativasSugestoes || []),
         motivosNotificarHumano: JSON.stringify(motivosNotificarHumano || []),
         nivelPersonalidade: nivelPersonalidade || 'Equilibrado',
@@ -429,7 +436,7 @@ router.get('/:id', validateToken, async (req, res) => {
         INSERT INTO Automacoes (
           id, nome, descricao, campanhaId, status,
           detalheProduto, missaoIA, dadosColeta, estrategiaConvencimento,
-          estrategiaGeralConversao, acaoConvencido, acaoNaoConvencido, respostasRapidas,
+          estrategiaGeralConversao, acaoConvencido, acaoNaoConvencido, respostasRapidas, saudacoes,
           tentativasSugestoes, motivosNotificarHumano,
           nivelPersonalidade, tonConversa, tomDetalhado, palavrasEvitar,
           limiteTentativas, tempoEspera, tempoEsperaUnidade, notificarHumano,
@@ -437,7 +444,7 @@ router.get('/:id', validateToken, async (req, res) => {
         ) VALUES (
           @id, @nome, @descricao, @campanhaId, @status,
           @detalheProduto, @missaoIA, @dadosColeta, @estrategiaConvencimento,
-          @estrategiaGeralConversao, @acaoConvencido, @acaoNaoConvencido, @respostasRapidas,
+          @estrategiaGeralConversao, @acaoConvencido, @acaoNaoConvencido, @respostasRapidas, @saudacoes,
           @tentativasSugestoes, @motivosNotificarHumano,
           @nivelPersonalidade, @tonConversa, @tomDetalhado, @palavrasEvitar,
           @limiteTentativas, @tempoEspera, @tempoEsperaUnidade, @notificarHumano,
@@ -464,6 +471,7 @@ router.get('/:id', validateToken, async (req, res) => {
         acaoConvencido: original.acaoConvencido || '',
         acaoNaoConvencido: original.acaoNaoConvencido || '',
         respostasRapidas: original.respostasRapidas || '[]',
+        saudacoes: original.saudacoes || '[]',
         tentativasSugestoes: original.tentativasSugestoes || '[]',
         motivosNotificarHumano: original.motivosNotificarHumano || '[]',
         nivelPersonalidade: original.nivelPersonalidade || 'Equilibrado',
