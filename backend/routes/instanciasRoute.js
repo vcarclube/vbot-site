@@ -48,7 +48,7 @@ router.get('/:id', validateToken, async (req, res) => {
 // Atualizar uma instância (nome e vínculo com automação)
 router.put('/:id', validateToken, async (req, res) => {
   try {
-    const { name, automacaoId, AutomacaoRefName, AutomacaoRefId } = req.body;
+    const { name, automacaoId, AutomacaoRefName, AutomacaoRefId, phoneNumber, ccid } = req.body;
 
     const newName = (name || AutomacaoRefName || '').trim();
     const newAutomacaoId = automacaoId || AutomacaoRefId;
@@ -89,7 +89,9 @@ router.put('/:id', validateToken, async (req, res) => {
     const updateQuery = `
       UPDATE WhatsAppInstances
       SET AutomacaoRefId = @automacaoId,
-          AutomacaoRefName = @name
+          AutomacaoRefName = @name,
+          Numero = @phoneNumber,
+          CCID = @ccid
       WHERE Id = @id AND idUser = @idUser
     `;
 
@@ -97,7 +99,9 @@ router.put('/:id', validateToken, async (req, res) => {
       id: req.params.id,
       idUser: req.user.id,
       name: newName,
-      automacaoId: newAutomacaoId
+      automacaoId: newAutomacaoId,
+      phoneNumber: phoneNumber || null,
+      ccid: ccid || null
     });
 
     return res.json({ message: 'Instância atualizada com sucesso' });

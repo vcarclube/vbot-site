@@ -20,10 +20,10 @@ const Instancias = () => {
     status: ''
   });
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editForm, setEditForm] = useState({ name: '', automacaoId: '' });
+  const [editForm, setEditForm] = useState({ name: '', automacaoId: '', celular: '', ccid: '' });
   const [selectedInstancia, setSelectedInstancia] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createForm, setCreateForm] = useState({ name: '', automacaoId: '' });
+  const [createForm, setCreateForm] = useState({ name: '', automacaoId: '', celular: '', ccid: '' });
   
   // Constante para o intervalo de atualização (em milissegundos)
   const UPDATE_INTERVAL = 10000; // 10 segundos
@@ -175,7 +175,9 @@ const Instancias = () => {
     setSelectedInstancia(instancia);
     setEditForm({
       name: instancia.AutomacaoRefName || '',
-      automacaoId: instancia.AutomacaoRefId || ''
+      automacaoId: instancia.AutomacaoRefId || '',
+      celular: instancia.Numero || instancia.PhoneNumber || instancia.Celular || instancia.phoneNumber || '',
+      ccid: instancia.CCID || instancia.ccid || ''
     });
     setShowEditModal(true);
   };
@@ -186,6 +188,8 @@ const Instancias = () => {
     if (!selectedInstancia) return;
     const name = (editForm.name || '').trim();
     const automacaoId = editForm.automacaoId;
+    const celularRaw = (editForm.celular || '').trim();
+    const ccid = (editForm.ccid || '').trim();
     if (!name) {
       toast.error('Informe um nome para a instância');
       return;
@@ -195,7 +199,14 @@ const Instancias = () => {
       toast.error('Selecione uma automação válida');
       return;
     }
-    Api.updateInstancia(selectedInstancia.Id, { name, automacaoId })
+    // Sanitização: prioriza o valor digitado, com fallback ao que já existe na instância
+    const phoneFromForm = celularRaw.replace(/\D/g, '');
+    const fallbackRaw = (
+      (selectedInstancia?.PhoneNumber || selectedInstancia?.Numero || selectedInstancia?.Celular || selectedInstancia?.phoneNumber || '')
+    ).toString();
+    const phoneNumber = phoneFromForm || fallbackRaw.replace(/\D/g, '');
+
+    Api.updateInstancia(selectedInstancia.Id, { name, automacaoId, phoneNumber, ccid })
       .then(async (res) => {
         if (!res.success) {
           toast.error(res.error || 'Erro ao atualizar instância');
@@ -211,7 +222,7 @@ const Instancias = () => {
   };
 
   const openCreateModal = () => {
-    setCreateForm({ name: '', automacaoId: '' });
+    setCreateForm({ name: '', automacaoId: '', celular: '', ccid: '' });
     setShowCreateModal(true);
   };
 
@@ -235,6 +246,8 @@ const Instancias = () => {
   const handleSaveCreate = async () => {
     const name = (createForm.name || '').trim();
     const automacaoId = createForm.automacaoId;
+    const celularRaw = (createForm.celular || '').trim();
+    const ccid = (createForm.ccid || '').trim();
     if (!name) {
       toast.error('Informe um nome para a instância');
       return;
@@ -245,9 +258,12 @@ const Instancias = () => {
       return;
     }
     // Chamada ao endpoint externo para criar instância
+    const phoneNumber = celularRaw.replace(/\D/g, '');
     const payload = {
       AutomacaoRefId: automacaoId,
-      AutomacaoRefName: name
+      AutomacaoRefName: name,
+      phoneNumber,
+      ccid
     };
     const result = await Api.createInstanciaExternal(payload);
     if (!result.success) {
@@ -481,6 +497,24 @@ const Instancias = () => {
               ))}
             </Select>
           </div>
+          <div className="form-group">
+            <Input
+              label="Número de Celular"
+              name="celular"
+              value={editForm.celular}
+              onChange={(e) => setEditForm(prev => ({ ...prev, celular: e.target.value }))}
+              placeholder="(DDD) 9XXXX-XXXX"
+            />
+          </div>
+          <div className="form-group">
+            <Input
+              label="ICCID"
+              name="ccid"
+              value={editForm.ccid}
+              onChange={(e) => setEditForm(prev => ({ ...prev, ccid: e.target.value }))}
+              placeholder="Informe o ICCID"
+            />
+          </div>
           <div className="modal-footer">
             <Button variant="secondary" onClick={closeEditModal}>Cancelar</Button>
             <Button onClick={handleSaveEdit}>Salvar</Button>
@@ -513,6 +547,22 @@ const Instancias = () => {
                 <option key={a.id} value={a.id}>{a.nome}</option>
               ))}
             </Select>
+          </div>
+          <div className="form-group">
+            <Input
+              label="Número de Celular"
+              value={createForm.celular}
+              onChange={(e) => setCreateForm(prev => ({ ...prev, celular: e.target.value }))}
+              placeholder="(DDD) 9XXXX-XXXX"
+            />
+          </div>
+          <div className="form-group">
+            <Input
+              label="ICCID"
+              value={createForm.ccid}
+              onChange={(e) => setCreateForm(prev => ({ ...prev, ccid: e.target.value }))}
+              placeholder="Informe o ICCID"
+            />
           </div>
           <div className="modal-footer">
             <Button variant="secondary" onClick={closeCreateModal}>Cancelar</Button>

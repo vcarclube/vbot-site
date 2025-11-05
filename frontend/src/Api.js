@@ -200,9 +200,10 @@ const Api = {
         }
     },
 
-    updateInstancia: async (id, { name, automacaoId }) => {
+    updateInstancia: async (id, { name, automacaoId, phoneNumber, ccid }) => {
         try {
-            const response = await axios.put(`${API_BASE}/instancias/${id}`, { name, automacaoId }, Environment.HEADERS);
+            const payload = { name, automacaoId, phoneNumber, ccid };
+            const response = await axios.put(`${API_BASE}/instancias/${id}`, payload, Environment.HEADERS);
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao atualizar instância' };
@@ -210,9 +211,13 @@ const Api = {
     },
 
     // Criação de instância via endpoint externo 3003
-    createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName }) => {
+    createInstanciaExternal: async ({ AutomacaoRefId, AutomacaoRefName, phoneNumber, ccid }) => {
         try {
-            const response = await axios.post(`https://api.vcarclube.com.br/v2/create-instance`, { AutomacaoRefId, AutomacaoRefName });
+            const body = { AutomacaoRefId, AutomacaoRefName };
+            // Enviar campos adicionais se presentes
+            if (phoneNumber) body.phoneNumber = phoneNumber;
+            if (ccid) body.ccid = ccid;
+            const response = await axios.post(`https://api.vcarclube.com.br/v2/create-instance`, body);
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao criar instância' };
