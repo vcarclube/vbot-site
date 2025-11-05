@@ -278,7 +278,7 @@ const Instancias = () => {
 
   const handleRestartAll = async () => {
     try {
-      const res = await Api.restartAllIntaces();
+      const res = await Api.startAllIntaces();
       if (!res.success) {
         toast.error(`Erro ao reiniciar todas as instâncias: ${res.error}`);
         return;

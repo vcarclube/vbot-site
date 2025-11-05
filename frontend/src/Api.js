@@ -235,9 +235,9 @@ const Api = {
     },
 
     // Reiniciar todas as instâncias via backend
-    restartAllIntaces: async () => {
+    startAllIntaces: async () => {
         try {
-            const response = await axios.post(`https://api.vcarclube.com.br/v1/api/instances/restart-all`, {}, Environment.HEADERS);
+            const response = await axios.post(`https://api.vcarclube.com.br/v1/api/instances/start-all`, {}, Environment.HEADERS);
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao reiniciar todas as instâncias' };
