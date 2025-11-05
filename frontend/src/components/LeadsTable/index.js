@@ -60,7 +60,7 @@ const LeadsTable = ({filteredLeads, handleEditLead, handleDeleteLead}) => {
         if (!carrierName) return null;
         const up = String(carrierName).toUpperCase();
         if (up.includes('CLARO')) return `../claro.png`;
-        if (up.includes('VIVO') || up.includes('TELEFONICA')) return `../vivo.png`;
+        if (up.includes('VIVO') || up.includes('TELEFONICA')) return `../vivo.jpg`;
         if (up.includes('TIM')) return `../tim.png`;
         if (up.includes('OI')) return `../oi.png`;
         return null;
