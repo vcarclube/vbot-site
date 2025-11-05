@@ -173,6 +173,7 @@
     padding: var(--spacing-md);
     background-color: var(--white);
     border-bottom: 1px solid var(--gray-200);
+    position: relative;
 }
 
 .chat-contact-info {
@@ -233,6 +234,87 @@
 .chat-action-btn:hover {
     background-color: var(--gray-100);
     color: var(--gray-800);
+}
+
+/* Probabilidade de Conversão (Chat Header) */
+.conversion-probability {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: 4px;
+}
+
+.probability-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+}
+
+.probability-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--gray-200);
+    background-color: var(--gray-50);
+}
+
+.probability-badge .probability-value {
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.probability-bar {
+    width: 80px;
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.probability-fill {
+    height: 100%;
+    width: 0%;
+    transition: width var(--transition);
+}
+
+.probability-badge.high {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.probability-badge.high .probability-fill {
+    background: #22c55e;
+}
+
+.probability-badge.medium {
+    background: #fef9c3;
+    border-color: #fde68a;
+    color: #854d0e;
+}
+
+.probability-badge.medium .probability-fill {
+    background: #f59e0b;
+}
+
+.probability-badge.low {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #7f1d1d;
+}
+
+.probability-badge.low .probability-fill {
+    background: #ef4444;
+}
+
+/* Centro do header para probabilidade */
+.chat-conversion-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
 }
 
 /* Mensagens */

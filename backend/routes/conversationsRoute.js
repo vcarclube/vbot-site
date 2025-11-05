@@ -245,6 +245,7 @@ router.get('/details/lead/:phoneNumber', validateToken, async (req, res) => {
                 l.Nome,
                 l.Celular,
                 l.EtapaFunil,
+                l.ProbabilidadeConversao,
                 c.name AS campaignName,
                 c.id AS campaignId
             FROM 
@@ -284,6 +285,7 @@ router.get('/details/lead/:phoneNumber', validateToken, async (req, res) => {
                 status: lead.EtapaFunil || '(nenhum)',
                 campaignName: lead.campaignName,
                 campaignId: lead.campaignId,
+                ProbabilidadeConversao: lead.ProbabilidadeConversao.replace("%", "")
             };
         }
         

@@ -21,8 +21,9 @@ const Conversations = () => {
     const messageEndRef = useRef(null);
     const selectedConversationRef = useRef(null);
 
-    // Constante para o intervalo de atualização (em milissegundos)
-    const UPDATE_INTERVAL = 10000; // 10 segundos
+    // Intervalos de atualização (em milissegundos)
+    const UPDATE_INTERVAL = 10000; // mensagens
+    const PROB_UPDATE_INTERVAL = 5000; // probabilidade de conversão
 
     // Função para buscar conversas
     const fetchConversations = async () => {
@@ -119,6 +120,27 @@ const Conversations = () => {
         // Limpar intervalo ao desmontar o componente ou mudar de conversa
         return () => clearInterval(messageIntervalId);
     }, [selectedConversation]);
+
+    // Atualizar probabilidade de conversão a cada 5s
+    useEffect(() => {
+        if (!selectedConversation) return;
+
+        const probIntervalId = setInterval(() => {
+            if (selectedConversation && selectedConversationRef.current === selectedConversation.id) {
+                fetchContactDetails(selectedConversation.phoneNumber);
+            }
+        }, PROB_UPDATE_INTERVAL);
+
+        return () => clearInterval(probIntervalId);
+    }, [selectedConversation]);
+
+    // Classe visual para probabilidade
+    const getProbabilityClass = (value) => {
+        const v = Number.isFinite(value) ? value : 0;
+        if (v >= 70) return 'high';
+        if (v >= 30) return 'medium';
+        return 'low';
+    };
 
     // Rolar para o final da conversa quando novas mensagens são carregadas
     useEffect(() => {
@@ -387,7 +409,24 @@ const Conversations = () => {
                                             </p>
                                         </div>
                                     </div>
-
+                                    {contactDetails && typeof contactDetails?.ProbabilidadeConversao !== 'undefined' && (
+                                        <div className="chat-conversion-center">
+                                            <div className="conversion-probability">
+                                                <span className="probability-label">Probabilidade de Conversão</span>
+                                                {(() => {
+                                                    const prob = Math.round(Math.max(0, Math.min(100, Number(contactDetails?.ProbabilidadeConversao ?? 0))));
+                                                    return (
+                                                        <div className={`probability-badge ${getProbabilityClass(prob)}`}>
+                                                            <span className="probability-value">{prob}%</span>
+                                                            <div className="probability-bar">
+                                                                <div className="probability-fill" style={{ width: `${prob}%` }}></div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })()}
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="chat-actions">
                                         <button className="chat-action-btn" title="Buscar na conversa">
                                             <i className="fas fa-search"></i>
