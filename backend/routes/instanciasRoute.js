@@ -9,7 +9,7 @@ router.get('/all', validateToken, async (req, res) => {
     const query = `
       SELECT * FROM WhatsAppInstances 
       WHERE idUser = @idUser
-      ORDER BY Name
+      ORDER BY AutomacaoRefName ASC
     `;
     
     const result = await db.query(query, { idUser: req.user.id });
