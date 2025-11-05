@@ -276,6 +276,20 @@ const Instancias = () => {
     await fetchInstancias();
   };
 
+  const handleRestartAll = async () => {
+    try {
+      const res = await Api.restartAllIntaces();
+      if (!res.success) {
+        toast.error(`Erro ao reiniciar todas as instâncias: ${res.error}`);
+        return;
+      }
+      toast.success('Todas as instâncias foram reiniciadas');
+      await fetchInstancias();
+    } catch (error) {
+      toast.error('Erro ao reiniciar todas as instâncias');
+    }
+  };
+
   return (
     <AuthLayout>
       <div className="instancias-container">
@@ -284,9 +298,14 @@ const Instancias = () => {
             <h1>Instâncias WhatsApp</h1>
             <p>Gerencie suas conexões com WhatsApp</p>
           </div>
-          <Button onClick={openCreateModal} className="create-instancia-btn">
-            <i className="fas fa-plus"></i>&nbsp;Nova Instância
-          </Button>
+          <div className="instancias-actions">
+            <Button onClick={openCreateModal} className="create-instancia-btn">
+              <i className="fas fa-plus"></i>&nbsp;Nova Instância
+            </Button>
+            <Button variant="secondary" onClick={handleRestartAll} className="restart-all-btn">
+              <i className="fas fa-sync"></i>&nbsp;Reiniciar Todas
+            </Button>
+          </div>
         </div>
         
         <Card className="instancias-filter-card">

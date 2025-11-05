@@ -10,6 +10,13 @@
     margin-bottom: var(--spacing-md);
   }
   
+  .instancias-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+  
   .instancias-title h1 {
     font-size: 1.75rem;
     color: var(--gray-900);

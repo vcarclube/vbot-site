@@ -234,6 +234,16 @@ const Api = {
         }
     },
 
+    // Reiniciar todas as instâncias via backend
+    restartAllIntaces: async () => {
+        try {
+            const response = await axios.post(`https://api.vcarclube.com.br/v1/api/instances/restart-all`, {}, Environment.HEADERS);
+            return { success: true, data: response.data };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Erro ao reiniciar todas as instâncias' };
+        }
+    },
+
     getAnalyticsLeadsGrowth: async (timeRange) => {
         try {
             const response = await axios.get(`${API_BASE}/analytics/leads-growth?timeRange=${timeRange}`, Environment.HEADERS);
