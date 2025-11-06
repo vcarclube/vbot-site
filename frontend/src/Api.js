@@ -227,7 +227,7 @@ const Api = {
     // Reiniciar instância via endpoint externo 3002
     restartInstanciaExternal: async (instanceName) => {
         try {
-            const response = await axios.post(`https://api.vcarclube.com.br/v1/api/instances`, { instanceName });
+            const response = await axios.post(`https://api.vcarclube.com.br/v1/api/instances/${instanceName}/start`, {}, Environment.HEADERS);
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data?.message || 'Erro ao reiniciar instância' };

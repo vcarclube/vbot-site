@@ -295,7 +295,7 @@ const Instancias = () => {
       <div className="instancias-container">
         <div className="instancias-header">
           <div className="instancias-title">
-            <h1>Instâncias WhatsApp</h1>
+            <h1>Instâncias WhatsApp ({instancias.length})</h1>
             <p>Gerencie suas conexões com WhatsApp</p>
           </div>
           <div className="instancias-actions">
